@@ -51,34 +51,36 @@ const Signup = () => {
 
   console.log(process.env.REACT_APP_SERVER_DOMIN) //In ra biến môi trường REACT_APP_SERVER_DOMAIN để kiểm tra xem có chính xác không?
 
-  const handleSubmit = async (e) => { //Hàm xử lý submit form khi người dùng click nút Sign up
-    e.preventDefault() //Ngăn chặn hành động submit mặc định của trình duyệt
-    //Set condition cho các trường nhập liệu bắt buộc
-    const { firstName, email, password, confirmPassword } = data
-    if (firstName && email && password && confirmPassword) { //Kiểm tra xem các input có rỗng hay không?
-      if (password.length >= 6 && /\d/.test(password) && /[!@#$%^&*-]/.test(password)) { //Kiểm tra độ dài và cấu trúc của password
-        if (password === confirmPassword) { //Kiểm tra xem password và confirmPassword có giống nhau hay không?
-          const fetchData = fetch(`${process.env.REACT_APP_SERVER_DOMAIN}/signup`, { //Gọi API POST tới server để đăng ký tài khoản mới
-            method: "POST",
-            headers: {
-              "content-type": "application/json"
-            },
-            body: JSON.stringify(data)
-          })
-          const dataRes = await fetchData.json() //Lấy kết quả trả về từ server dạng json
-          console.log(dataRes) //Kiểm tra kết quả trả về từ server
-          toast(dataRes.message) //Hiển thị thông báo thành công hoặc lỗi bằng thư viện react-hot-toast
-          if (dataRes.alert) { //Nếu đăng ký thành công thì redirect sang trang đăng nhập
-            navigate("/login");
+  const handleSubmit = async (e) => { // Khai báo hàm xử lý submit form khi người dùng click nút `Sign up`
+    e.preventDefault() // Hàm này sẽ ngăn chặn hành động submit mặc định của trình duyệt
+    const { firstName, email, password, confirmPassword } = data // Lấy giá trị từ các input trong object `data`
+    if (firstName && email && password && confirmPassword) { // Kiểm tra xem các input có rỗng hay không?
+      if (password.length >= 6 && /\d/.test(password) && /[!@#$%^&*-]/.test(password)) { // Kiểm tra độ dài và cấu trúc của password. Điều kiện yêu cầu phải có ít nhất 6 ký tự, một số và một ký tự đặc biệt.
+        if (password === confirmPassword) { // Kiểm tra xem password và confirmPassword có giống nhau hay không?
+          try {
+          // Gọi API POST tới server để đăng ký tài khoản mới
+            const response = await fetch(`${process.env.REACT_APP_SERVER_DOMAIN}/signup`, {
+              method: "POST",
+              headers: { "content-type": "application/json" },
+              body: JSON.stringify(data) // Chuyển đổi data thành chuỗi và gửi lên server
+            })
+            const dataRes = await response.json() // Lấy kết quả trả về từ server dạng json
+            console.log(dataRes) // Log kết quả trả về từ server để debug
+            toast(dataRes.message) // Hiển thị thông báo thành công hoặc lỗi bằng thư viện react-hot-toast
+            if (dataRes.alert) { // Nếu đăng ký thành công thì redirect sang trang đăng nhập
+              navigate("/login");
+            }
+          } catch (error) {
+            console.log(error.message )
           }
         } else {
-          alert("Password and confirm password not equal") //Thông báo password và confirmPassword không giống nhau
+          alert("Password and confirm password not equal")
         }
       } else {
-        alert("Password must have at least 6 characters, at least one number, and at least one special character (!@#$%^&*)") //Thông báo điều kiện password không đúng
+        alert("Password must have at least 6 characters, at least one number, and at least one special character (!@#$%^&*)")
       }
     } else {
-      alert("Please enter required fields") //Thông báo yêu cầu nhập đầy đủ các trường bắt buộc
+      alert("Please enter required fields") // Thông báo yêu cầu nhập đầy đủ các trường bắt buộc
     }
   }
 

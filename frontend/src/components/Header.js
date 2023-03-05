@@ -8,21 +8,23 @@ import { logoutRedux } from '../redux/userSlice';
 import { toast } from 'react-hot-toast';
 
 const Header = () => {
-  const [showMenu, setShowMenu] = useState(false)
+  const [showMenu, setShowMenu] = useState(false)  // State Hook được sử dụng để giữ thông tin về trạng thái của menu hiển thị hoặc ẩn
 
-  const userData = useSelector((state) => state.user)
-  console.log(userData)
+  const userData = useSelector((state) => state.user)  // Sử dụng hooks useSelector từ Redux để lắng nghe và cập nhật thông tin người dùng 
+  console.log(userData.email) // In ra email của người dùng từ store userData
 
-  const dispatch = useDispatch()
+  const dispatch = useDispatch() // Sử dụng hooks useDispatch từ Redux để gọi các action của reducer, để tương tác với store trong React 
 
   const handleShowMenu = () => {
-    setShowMenu(preve => !preve)
-    toast("Logout successfully")
+    setShowMenu(prev => !prev) // Hàm xử lý khi người dùng click vào icon user để mở/đóng menu
   }
 
   const handleLogout = () => {
-    dispatch(logoutRedux())
+    dispatch(logoutRedux())  // Đăng xuất user, gọi function logoutRedux từ trong rootReducer sử dụng useSelector và useDispatch hooks đã import
+    toast("Logout successfully")
   }
+
+  console.log(process.env.REACT_APP_ADMIN_EMAIL) // Log ra email của admin từ biến môi trường REACT_APP_ADMIN_EMAIL 
 
   return (
     <header className='fixed shadow-md w-full h-32 px-2 md:px-4 z-50 bg-white' style={{ borderBottom: '2px solid #ccc' }}>
@@ -60,14 +62,18 @@ const Header = () => {
                   </div>
               }
             </div>
-            {showMenu && (
-              <div className='absolute top-23 right-4 bg-white py-1 px-3 shadow drop-shadow-md flex flex-col'>
-                <Link to={'/newproduct'} className='whitespace-nowrap cursor-pointer text-black'>New product</Link>
-                {
-                  userData.image ? <p className='flex items-center justify-center cursor-pointer text-white px-3 bg-red-300' onClick={handleLogout}>Logout</p> : <Link to={'/login'} className='whitespace-nowrap cursor-pointer text-black'>Login</Link>
-                }
-              </div>
-            )}
+            {/* Nếu showMenu == true, render dropdown menu */}
+              {showMenu && (
+                <div className='absolute top-23 right-4 bg-white py-1 px-3 shadow drop-shadow-md flex flex-col'>
+                  {
+                    //Hiện thị link 'New product' cho người dùng với email là email của admin
+                    userData.email === process.env.REACT_APP_ADMIN_EMAIL && <Link to={'/newproduct'} className='whitespace-nowrap cursor-pointer text-black'>New product</Link>
+                  }
+                  {
+                    userData.image ? <p className='flex items-center justify-center cursor-pointer text-white px-3 bg-red-300' onClick={handleLogout}>Logout ({userData.firstName})</p> : <Link to={'/login'} className='whitespace-nowrap cursor-pointer text-black'>Login</Link>
+                  }
+                </div>
+              )}
           </div>
         </div>
       </div>
