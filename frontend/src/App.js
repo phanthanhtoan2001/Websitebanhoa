@@ -20,8 +20,6 @@ function App() {
     })()
   }, [])
 
-  console.log(productData)
-
   return (
     <div>
       <Toaster />

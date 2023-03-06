@@ -66,7 +66,7 @@ const Login = () => {
   return (
     <div className='p-5 md:p-10'>
       <div className='w-full max-w-[800px] max-w-sm bg-white m-auto flex items-center flex-col p-2'>
-        <h1 className='text-center text-2x1 font-bold' style={{fontSize: '24px'}}>Sign up</h1>
+        <h1 className='text-center text-2xl font-bold' style={{fontSize: '24px'}}>Sign up</h1>
         <div className='w-40 overflow-hidden rounded-full drop-shadow-md shadow-md'>
           <img src={loginImage} className='w-full'/>
         </div>

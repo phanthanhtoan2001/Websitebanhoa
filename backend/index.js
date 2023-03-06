@@ -126,10 +126,10 @@ app.post("/uploadProduct", async (req, res) => {
 })
 
 // Product page
-// app.get("/product", async (req, res) => {
-//   const data = await productModel.find({})
-//   res.send(data)
-// })
+app.get("/product", async (req, res) => {
+  const data = await productModel.find({})
+  res.send(data)
+})
 
 // Khởi động máy chủ
 app.listen(PORT, () => console.log("Server is running at port: " + PORT));

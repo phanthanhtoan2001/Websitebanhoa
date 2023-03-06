@@ -41,17 +41,15 @@ const NewProduct = () => {
     e.preventDefault() // Ngăn không cho trình duyệt tự động submit form
     console.log(data)
 
-    const { name, image, category } = data
-    const formattedPrice = Number(data.price).toFixed(2)
+    const { name, image, category, price } = data
 
-    // Kiểm tra xem tất cả các thuộc tính đã được nhập đầy đủ và kiểm tra giá có 2 chữ số thập phân không
-    if (name && image && category && formattedPrice === data.price) {
+    if (name && image && category && price.includes(".") && price) {
       const fetchData = await fetch(`${process.env.REACT_APP_SERVER_DOMAIN}/uploadProduct`, {
         method: "POST",
         headers: {
           "content-type": "application/json"
         },
-        body: JSON.stringify({ ...data, price: formattedPrice }) // Cập nhật giá trị của price với giá trị đã được format
+        body: JSON.stringify(data)
       })
 
       const fetchRes = await fetchData.json()
@@ -59,10 +57,17 @@ const NewProduct = () => {
       console.log(fetchRes)
       toast(fetchRes.message) // Thông báo đã upload sản phẩm thành công
 
-      // Trả lại một số chức năng ở đây để tránh các sự cố tiềm ẩn trong quá trình học lập trình
-      return (() => { })
+      setData(() => {
+        return {
+          name: "",
+          category: "",
+          image: "",
+          price: "",
+          description: ""
+        }
+      })
     } else if (!data.price.includes(".")) {
-      toast("Please enter a valid price") // Thông báo khi giá không hợp lệ
+      toast("Please enter a valid price"); // Thông báo khi giá không hợp lệ
     } else {
       toast("Enter required fields") // Thông báo khi chưa điền đầy đủ thông tin yêu cầu
     }
@@ -88,7 +93,7 @@ const NewProduct = () => {
         <label htmlFor='image'>Image
           <div className='h-40 w-full rounded mt-1 mb-3 rounded flex items-center justify-center cursor-pointer' style={{ background: '#99CCCC' }}>
             {
-              data.image ? <img src={data.image} className='h-full' /> : <span className='text-4x1'><FiUploadCloud size={60} /></span>
+              data.image ? <img src={data.image} className='h-full' /> : <span className='text-4xl'><FiUploadCloud size={60} /></span>
             }
             <input type="file" id="image" onChange={uploadImage} accept='image/*' className="hidden" />
           </div>
