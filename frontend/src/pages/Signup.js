@@ -58,7 +58,7 @@ const Signup = () => {
       if (password.length >= 6 && /\d/.test(password) && /[!@#$%^&*-]/.test(password)) { // Kiểm tra độ dài và cấu trúc của password. Điều kiện yêu cầu phải có ít nhất 6 ký tự, một số và một ký tự đặc biệt.
         if (password === confirmPassword) { // Kiểm tra xem password và confirmPassword có giống nhau hay không?
           try {
-          // Gọi API POST tới server để đăng ký tài khoản mới
+            // Gọi API POST tới server để đăng ký tài khoản mới
             const response = await fetch(`${process.env.REACT_APP_SERVER_DOMAIN}/signup`, {
               method: "POST",
               headers: { "content-type": "application/json" },
@@ -66,21 +66,23 @@ const Signup = () => {
             })
             const dataRes = await response.json() // Lấy kết quả trả về từ server dạng json
             console.log(dataRes) // Log kết quả trả về từ server để debug
-            toast(dataRes.message) // Hiển thị thông báo thành công hoặc lỗi bằng thư viện react-hot-toast
+            toast(dataRes.message, {
+              style: { backgroundColor: '#00FF7F', color: 'white' }
+            }) // Hiển thị thông báo thành công hoặc lỗi bằng thư viện react-hot-toast
             if (dataRes.alert) { // Nếu đăng ký thành công thì redirect sang trang đăng nhập
               navigate("/login");
             }
           } catch (error) {
-            console.log(error.message )
+            console.log(error.message)
           }
         } else {
-          alert("Password and confirm password not equal")
+          toast("Password and confirm password not equal", { style: { background: 'red', color: 'white' } })
         }
       } else {
-        alert("Password must have at least 6 characters, at least one number, and at least one special character (!@#$%^&*)")
+        toast("Password must have at least 6 characters, at least one number, and at least one special character (!@#$%^&*)", { style: { background: 'red', color: 'white' } })
       }
     } else {
-      alert("Please enter required fields") // Thông báo yêu cầu nhập đầy đủ các trường bắt buộc
+      toast("Please enter required fields", { style: { background: 'red', color: 'white' } }) // Thông báo yêu cầu nhập đầy đủ các trường bắt buộc
     }
   }
 

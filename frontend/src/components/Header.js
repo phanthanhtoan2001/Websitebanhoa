@@ -34,7 +34,7 @@ const Header = () => {
             <img src={logo} className="h-full" />
           </div>
         </Link>
-        <div className='flex items-center gap-4 md:gap-7'>
+        <div className='flex items-center gap-4 md:gap-7 hidden md:flex'>
           <Link to={'/'} className='mx-4 text-gray-600 hover:text-red-500 my-2 md:my-0' style={{ fontSize: '1.6rem' }}>
             Home
           </Link>

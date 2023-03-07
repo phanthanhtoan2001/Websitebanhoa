@@ -55,7 +55,9 @@ const NewProduct = () => {
       const fetchRes = await fetchData.json()
 
       console.log(fetchRes)
-      toast(fetchRes.message) // Thông báo đã upload sản phẩm thành công
+      toast(fetchRes.message, {
+        style: { backgroundColor: '#00FF7F', color: 'white' }
+      }) // Thông báo đã upload sản phẩm thành công
 
       setData(() => {
         return {
@@ -66,10 +68,16 @@ const NewProduct = () => {
           description: ""
         }
       })
-    } else if (!data.price.includes(".")) {
-      toast("Please enter a valid price"); // Thông báo khi giá không hợp lệ
+
+      if (!data.price.includes(".")) {
+        toast("Please enter a valid price", {
+          style: { background: 'red', color: 'white' }
+        })
+      }  // Thông báo khi giá không hợp lệ
     } else {
-      toast("Enter required fields") // Thông báo khi chưa điền đầy đủ thông tin yêu cầu
+      toast("Enter required fields", {
+        style: { background: 'red', color: 'white' }
+      }) // Thông báo khi chưa điền đầy đủ thông tin yêu cầu
     }
   }
 

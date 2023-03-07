@@ -89,11 +89,15 @@ app.post('/login', async (req, res) => {
         message: 'Login is successful',
         alert: true,
         data: dataSend,
+        background: '#00FF7F',
+        color: 'white'
       });
     } else { // Nếu không tìm thấy người dùng trong DB
       res.send({ // Gửi thông báo lỗi
         message: 'Email is not available, please sign up',
         alert: false,
+        background: 'red',
+        color: 'white'
       });
     }
   } catch (error) { // Bắt lỗi được đưa ra trong quá trình hoạt động không đồng bộ/chờ đợi
@@ -101,6 +105,8 @@ app.post('/login', async (req, res) => {
     res.send({ // Gửi thông báo lỗi
       message: 'Error occurred while finding user data',
       alert: false,
+      background: 'red',
+      color: 'white'
     });
   }
 });
@@ -122,10 +128,14 @@ app.post("/uploadProduct", async (req, res) => {
   console.log(req.body)
   const data = await productModel(req.body) // Tạo một tài liệu mới từ dữ liệu nội dung yêu cầu nhận được
   const datasave = await data.save() // Lưu tài liệu mới vào cơ sở dữ liệu
-  res.send({ message: "Upload successfully" }) // Gửi phản hồi xác nhận upload thành công
+  res.send({
+    message: "Upload successfully",
+    background: '#00FF7F',
+    color: 'white'
+  }) // Gửi phản hồi xác nhận upload thành công
 })
 
-// Product page
+//  Product page
 app.get("/product", async (req, res) => {
   const data = await productModel.find({})
   res.send(data)
