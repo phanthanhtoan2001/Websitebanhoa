@@ -1,33 +1,56 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import MotorBike from "../assets/motorbike.png"
 import Flowers from "../assets/flowers.png"
 import Friendly from "../assets/friendly.png"
 import HomeCard from "../components/HomeCard";
 import CardFeature from "../components/CardFeature";
-import { GrFormPreviousLink, GrFormNextLink } from "react-icons/gr"
+import { GrFormPreviousLink, GrFormNextLink } from "react-icons/gr";
+import _ from 'lodash';
+import FilterProducts from "../components/FilterProducts";
 
 const Home = () => {
-    const productData = useSelector((state) => state.product.productList)
-    console.log(productData)
+    const productData = useSelector((state) => state.product.productList);
+    console.log(productData);
 
-    const homeProducCartList = productData.slice(0, 5)
+    const homeProducCartList = productData.slice(0, 5);
 
-    const homeProducCartListRose = productData.filter(e => e.category === "rose", [])
-    console.log(homeProducCartListRose)
+    const homeProducCartListFlower = [...productData].filter((item) => ["rose", "orchid", "lily", "apricot", "lotus", "hibiscus"].includes(item.category)).slice(0, 10)
 
-    const loadingArray = new Array(5).fill(null)
-    const loadingArrayFeature = new Array(10).fill(null)
+    console.log(homeProducCartListFlower)
 
-    const slideProductRef = useRef()
+    const loadingArray = new Array(5).fill(null);
+    const loadingArrayFeature = new Array(10).fill(null);
+
+    const slideProductRef = useRef();
     const nextProduct = () => {
         slideProductRef.current.scrollLeft += 200;
     };
-
     const previousProduct = () => {
         slideProductRef.current.scrollLeft -= 200;
     };
 
+    const categories = ["rose", "orchid", "lily", "apricot", "lotus", "hibiscus"];
+
+    const [filterBy, setFilterBy] = useState("");
+    const [dataFilter, setDataFilter] = useState([]);
+
+    useEffect(() => {
+        setDataFilter(productData);
+    }, [productData]);
+
+    const handleFilterProduct = (selectedCategory) => {
+        let filteredData = [];
+        if (selectedCategory === "Flowers") {
+            filteredData = homeProducCartListFlower;
+        } else {
+            filteredData = productData.filter(
+                (prodData) =>
+                    prodData.category.toLowerCase() === selectedCategory.toLowerCase()
+            );
+        }
+        setDataFilter(filteredData);
+    };
     return (
         <div className="p-2 md:p-4">
             <div className="md:flex gap-4 py-2">
@@ -52,7 +75,7 @@ const Home = () => {
                     <button className="font-bold bg-red-500 text-slate-200 px-4 py-2 rounded-md hover:bg-blue-500" style={{ fontSize: "18px" }}>Order now</button>
                 </div>
 
-                <div className="md:w-1/2 flex flex-wrap gap-5 p-4">
+                <div className="md:w-1/2 flex flex-wrap gap-5 p-4" style={{ justifyContent: "center" }}>
                     {
                         homeProducCartList[0] ? homeProducCartList.map(e => {
                             return (
@@ -78,27 +101,55 @@ const Home = () => {
 
             <div className="">
                 <div className="flex w-full items-center">
-                    <h2 className="font-bold text-3xl text-slate-800 mb-4">Rose Flowers</h2>
+                    <h2 className="font-bold text-3xl text-slate-800 mb-4">Flowers</h2>
                     <div className="ml-auto flex gap-4">
                         <button className="text-4xl bg-green-300 hover:bg-red-300 p-1 rounded-full" onClick={previousProduct}><GrFormPreviousLink /></button>
                         <button className="text-4xl bg-green-300 hover:bg-red-300 p-1 rounded-full" onClick={nextProduct}><GrFormNextLink /></button>
                     </div>
                 </div>
                 <div className="flex gap-5 overflow-x-scroll scrollbar-none" style={{ scrollBehavior: 'smooth', willChange: "transform" }} ref={slideProductRef}>
-                    {
-                        homeProducCartListRose[0] ? homeProducCartListRose.map(e => {
+                    {homeProducCartListFlower[0]
+                        ? homeProducCartListFlower.map((e) => {
                             return (
                                 <CardFeature
                                     key={e._id}
+                                    id={e._id}
                                     name={e.name}
                                     category={e.category}
                                     price={e.price}
                                     image={e.image}
                                 />
-                            )
-                        }) : loadingArrayFeature.map(e => <CardFeature loading="Loading..." />)
-                    }
+                            );
+                        })
+                        : loadingArrayFeature.map((el, index) => (
+                            <CardFeature loading="Loading..." key={index + "cartLoading"} />
+                        ))}
                 </div>
+            </div>
+
+
+            <div className="my-5 mt-6">
+                <h2 className="font-bold text-3xl text-slate-800 mb-4">
+                    All Product
+                </h2>
+            </div>
+
+            <div className='flex'>
+                <FilterProducts categoryList={categories} onClick={(category) => handleFilterProduct(category)} />
+            </div>
+
+            <div className="flex flex-wrap justify-center gap-5 my-8">
+                {
+                    dataFilter.map((e) => (
+                        <CardFeature
+                            key={e._id}
+                            image={e.image}
+                            name={e.name}
+                            category={e.category}
+                            price={e.price}
+                        />
+                    ))
+                }
             </div>
         </div>
     )

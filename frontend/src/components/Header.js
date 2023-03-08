@@ -53,6 +53,7 @@ const Header = () => {
               < div className='absolute left-5 top-5 text-white bg-red-500 h-5 w-5 rounded-full m-0 text-sm text-center'>0</div>
             </Link>
           </div>
+
           <div className='text-slate-600' onClick={handleShowMenu}>
             <div className='text-3x1 cursor-pointer w-10 h-10 rounded-full overflow-hidden drop-shadow-md'>
               {
@@ -63,17 +64,17 @@ const Header = () => {
               }
             </div>
             {/* Nếu showMenu == true, render dropdown menu */}
-              {showMenu && (
-                <div className='absolute top-23 right-4 bg-white py-1 px-3 shadow drop-shadow-md flex flex-col'>
-                  {
-                    //Hiện thị link 'New product' cho người dùng với email là email của admin
-                    userData.email === process.env.REACT_APP_ADMIN_EMAIL && <Link to={'/newproduct'} className='whitespace-nowrap cursor-pointer text-black'>New product</Link>
-                  }
-                  {
-                    userData.image ? <p className='flex items-center justify-center cursor-pointer text-white px-3 bg-red-300' onClick={handleLogout}>Logout ({userData.firstName})</p> : <Link to={'/login'} className='whitespace-nowrap cursor-pointer text-black'>Login</Link>
-                  }
-                </div>
-              )}
+            {showMenu && (
+              <div className='absolute top-23 right-4 bg-white py-1 px-3 shadow drop-shadow-md flex flex-col'>
+                {
+                  //Hiện thị link 'New product' cho người dùng với email là email của admin
+                  userData.email === process.env.REACT_APP_ADMIN_EMAIL && <Link to={'/newproduct'} className='whitespace-nowrap cursor-pointer text-black'>New product</Link>
+                }
+                {
+                  userData.image ? (<p className='flex items-center justify-center cursor-pointer text-white px-3 bg-red-300' onClick={handleLogout}>Logout ({userData.firstName})</p>) : (<Link to={'/login'} className='whitespace-nowrap cursor-pointer text-black'>Login</Link>)
+                }
+              </div>
+            )}
           </div>
         </div>
       </div>
