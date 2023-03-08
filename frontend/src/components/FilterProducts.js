@@ -7,16 +7,16 @@ import OrchidIcon from "../assets/icon-orchid.png";
 import HibiscusIcon from "../assets/icon-hibiscus.png";
 
 const FilterProducts = ({ categoryList, onClick }) => {
-    const [products, setProducts] = useState([]); // Tạo biến trạng thái để lưu danh sách sản phẩm
+    // const [products, setProducts] = useState([]); // Tạo biến trạng thái để lưu danh sách sản phẩm
 
-    const handleClick = (category) => {
-        // Xử lý sự kiện click category filter
-        const filteredProducts = products.filter((product) =>
-            product.categories.includes(category)
-        );
-        setProducts(filteredProducts);
-        onClick(filteredProducts); // Gọi hàm onClick và truyền vào danh sách sản phẩm lọc
-    };
+    // const handleClick = (category) => {
+    //     // Xử lý sự kiện click category filter
+    //     const filteredProducts = products.filter((product) =>
+    //         product.categories.includes(category)
+    //     );
+    //     setProducts(filteredProducts);
+    //     onClick(filteredProducts); // Gọi hàm onClick và truyền vào danh sách sản phẩm lọc
+    // };
 
     return (
         <div className="flex justify-center space-x-8 w-full md:space-x-10 mx-auto">

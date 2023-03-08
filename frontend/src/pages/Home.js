@@ -6,7 +6,6 @@ import Friendly from "../assets/friendly.png"
 import HomeCard from "../components/HomeCard";
 import CardFeature from "../components/CardFeature";
 import { GrFormPreviousLink, GrFormNextLink } from "react-icons/gr";
-import _ from 'lodash';
 import FilterProducts from "../components/FilterProducts";
 
 const Home = () => {
@@ -16,7 +15,6 @@ const Home = () => {
     const homeProducCartList = productData.slice(0, 5);
 
     const homeProducCartListFlower = [...productData].filter((item) => ["rose", "orchid", "lily", "apricot", "lotus", "hibiscus"].includes(item.category)).slice(0, 10)
-
     console.log(homeProducCartListFlower)
 
     const loadingArray = new Array(5).fill(null);
@@ -143,6 +141,7 @@ const Home = () => {
                     dataFilter.map((e) => (
                         <CardFeature
                             key={e._id}
+                            id={e._id}
                             image={e.image}
                             name={e.name}
                             category={e.category}
