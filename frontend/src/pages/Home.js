@@ -1,54 +1,42 @@
-import React, { useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import React, { useEffect, useRef, useState } from "react"
+import { useSelector } from "react-redux"
 import MotorBike from "../assets/motorbike.png"
 import Flowers from "../assets/flowers.png"
 import Friendly from "../assets/friendly.png"
-import HomeCard from "../components/HomeCard";
-import CardFeature from "../components/CardFeature";
-import { GrFormPreviousLink, GrFormNextLink } from "react-icons/gr";
-import FilterProducts from "../components/FilterProducts";
+import HomeCard from "../components/HomeCard"
+import CardFeature from "../components/CardFeature"
+import { GrFormPreviousLink, GrFormNextLink } from "react-icons/gr"
+import AllProduct from "../components/AllProduct"
 
 const Home = () => {
-    const productData = useSelector((state) => state.product.productList);
-    console.log(productData);
+    // Sử dụng hook useSelector từ react-redux để lấy state productList từ store của redux
+    const productData = useSelector((state) => state.product.productList)
+    console.log(productData)
 
-    const homeProducCartList = productData.slice(0, 5);
+    // Lấy 5 sản phẩm đầu tiên cho giỏ hàng trang chủ
+    const homeProducCartList = productData.slice(0, 5)
 
-    const homeProducCartListFlower = [...productData].filter((item) => ["rose", "orchid", "lily", "apricot", "lotus", "hibiscus"].includes(item.category)).slice(0, 10)
+    // Lọc và lấy 10 sản phẩm hoa đầu tiên cho giỏ hàng trang chủ
+    const homeProducCartListFlower = [...productData].filter((item) => ["rose", "orchid", "lily", "apricot", "lotus", "hibiscus"].includes(item.category)).slice(0, 11)
     console.log(homeProducCartListFlower)
 
-    const loadingArray = new Array(5).fill(null);
-    const loadingArrayFeature = new Array(10).fill(null);
+    // Tạo hai mảng với các giá trị null
+    const loadingArray = new Array(5).fill(null)
+    const loadingArrayFeature = new Array(10).fill(null)
 
-    const slideProductRef = useRef();
+    // Sử dụng useRef để lấy slideProductRef của danh sách sản phẩm cuộn được
+    const slideProductRef = useRef()
+
+    // Hàm di chuyển danh sách sản phẩm sang phải 200px khi nhấp vào nút
     const nextProduct = () => {
-        slideProductRef.current.scrollLeft += 200;
-    };
+        slideProductRef.current.scrollLeft += 300
+    }
+
+    // Hàm di chuyển danh sách sản phẩm sang trái 200px khi nhấp vào nút
     const previousProduct = () => {
-        slideProductRef.current.scrollLeft -= 200;
-    };
+        slideProductRef.current.scrollLeft -= 300
+    }
 
-    const categories = ["rose", "orchid", "lily", "apricot", "lotus", "hibiscus"];
-
-    const [filterBy, setFilterBy] = useState("");
-    const [dataFilter, setDataFilter] = useState([]);
-
-    useEffect(() => {
-        setDataFilter(productData);
-    }, [productData]);
-
-    const handleFilterProduct = (selectedCategory) => {
-        let filteredData = [];
-        if (selectedCategory === "Flowers") {
-            filteredData = homeProducCartListFlower;
-        } else {
-            filteredData = productData.filter(
-                (prodData) =>
-                    prodData.category.toLowerCase() === selectedCategory.toLowerCase()
-            );
-        }
-        setDataFilter(filteredData);
-    };
     return (
         <div className="p-2 md:p-4">
             <div className="md:flex gap-4 py-2">
@@ -98,8 +86,8 @@ const Home = () => {
             </div>
 
             <div className="">
-                <div className="flex w-full items-center">
-                    <h2 className="font-bold text-3xl text-slate-800 mb-4">Flowers</h2>
+                <div className="flex w-full items-center mt-5">
+                    <h2 className="font-bold text-3xl text-slate-800 mb-4">Best Beauty Flowers</h2>
                     <div className="ml-auto flex gap-4">
                         <button className="text-4xl bg-green-300 hover:bg-red-300 p-1 rounded-full" onClick={previousProduct}><GrFormPreviousLink /></button>
                         <button className="text-4xl bg-green-300 hover:bg-red-300 p-1 rounded-full" onClick={nextProduct}><GrFormNextLink /></button>
@@ -117,7 +105,7 @@ const Home = () => {
                                     price={e.price}
                                     image={e.image}
                                 />
-                            );
+                            )
                         })
                         : loadingArrayFeature.map((el, index) => (
                             <CardFeature loading="Loading..." key={index + "cartLoading"} />
@@ -125,33 +113,9 @@ const Home = () => {
                 </div>
             </div>
 
-
-            <div className="my-5 mt-6">
-                <h2 className="font-bold text-3xl text-slate-800 mb-4">
-                    All Product
-                </h2>
-            </div>
-
-            <div className='flex'>
-                <FilterProducts categoryList={categories} onClick={(category) => handleFilterProduct(category)} />
-            </div>
-
-            <div className="flex flex-wrap justify-center gap-5 my-8">
-                {
-                    dataFilter.map((e) => (
-                        <CardFeature
-                            key={e._id}
-                            id={e._id}
-                            image={e.image}
-                            name={e.name}
-                            category={e.category}
-                            price={e.price}
-                        />
-                    ))
-                }
-            </div>
+            <AllProduct heading={"All Product"}/>
         </div>
     )
 }
 
-export default Home;
+export default Home

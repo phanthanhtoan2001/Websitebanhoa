@@ -1,11 +1,11 @@
-import logo from './logo.svg';
-import './App.css';
-import { Outlet } from 'react-router-dom';
-import Header from './components/Header';
-import toast, { Toaster } from "react-hot-toast";
-import { useEffect } from 'react';
-import { setDataProduct } from './redux/productSlice';
-import { useDispatch, useSelector } from 'react-redux';
+import logo from './logo.svg'
+import './App.css'
+import { Outlet } from 'react-router-dom'
+import Header from './components/Header'
+import toast, { Toaster } from "react-hot-toast"
+import { useEffect } from 'react'
+import { setDataProduct } from './redux/productSlice'
+import { useDispatch, useSelector } from 'react-redux'
 
 function App() {
   const dispatch = useDispatch()
@@ -30,8 +30,8 @@ function App() {
         </div>
       </main>
     </div>
-  );
+  )
 }
 
 
-export default App;
+export default App

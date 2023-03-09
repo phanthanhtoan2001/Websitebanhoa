@@ -1,22 +1,22 @@
-import React, { useState } from "react";
-import RoseIcon from "../assets/icon-rose.png";
-import LotusIcon from "../assets/icon-lotus.png";
-import ApricotIcon from "../assets/icon-apricot.png";
-import LilyIcon from "../assets/icon-lily.png";
-import OrchidIcon from "../assets/icon-orchid.png";
-import HibiscusIcon from "../assets/icon-hibiscus.png";
+import React, { useState } from "react"
+import RoseIcon from "../assets/icon-rose.png"
+import LotusIcon from "../assets/icon-lotus.png"
+import ApricotIcon from "../assets/icon-apricot.png"
+import LilyIcon from "../assets/icon-lily.png"
+import OrchidIcon from "../assets/icon-orchid.png"
+import HibiscusIcon from "../assets/icon-hibiscus.png"
 
 const FilterProducts = ({ categoryList, onClick }) => {
-    // const [products, setProducts] = useState([]); // Tạo biến trạng thái để lưu danh sách sản phẩm
+    // const [products, setProducts] = useState([]) // Tạo biến trạng thái để lưu danh sách sản phẩm
 
     // const handleClick = (category) => {
     //     // Xử lý sự kiện click category filter
     //     const filteredProducts = products.filter((product) =>
     //         product.categories.includes(category)
-    //     );
-    //     setProducts(filteredProducts);
-    //     onClick(filteredProducts); // Gọi hàm onClick và truyền vào danh sách sản phẩm lọc
-    // };
+    //     )
+    //     setProducts(filteredProducts)
+    //     onClick(filteredProducts) // Gọi hàm onClick và truyền vào danh sách sản phẩm lọc
+    // }
 
     return (
         <div className="flex justify-center space-x-8 w-full md:space-x-10 mx-auto">
@@ -50,7 +50,7 @@ const FilterProducts = ({ categoryList, onClick }) => {
                 </div>
             ))}
         </div>
-    );
-};
+    )
+}
 
-export default FilterProducts;
+export default FilterProducts

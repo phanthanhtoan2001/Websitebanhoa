@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
-import { toast } from 'react-hot-toast';
+import { toast } from 'react-hot-toast'
 import { FiUploadCloud } from "react-icons/fi"
-import { ImagetoBase64 } from '../utility/ImagetoBase64';
+import { ImagetoBase64 } from '../utility/ImagetoBase64'
 
 const NewProduct = () => {
   const [data, setData] = useState({

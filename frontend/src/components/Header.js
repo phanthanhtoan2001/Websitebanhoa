@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import logo from '../assets/logo.png';
-import { HiOutlineUserCircle } from 'react-icons/hi';
-import { FaShoppingCart } from 'react-icons/fa';
-import { useDispatch, useSelector } from 'react-redux';
-import { logoutRedux } from '../redux/userSlice';
-import { toast } from 'react-hot-toast';
+import React, { useState } from 'react'
+import { Link } from 'react-router-dom'
+import logo from '../assets/logo.png'
+import { HiOutlineUserCircle } from 'react-icons/hi'
+import { FaShoppingCart } from 'react-icons/fa'
+import { useDispatch, useSelector } from 'react-redux'
+import { logoutRedux } from '../redux/userSlice'
+import { toast } from 'react-hot-toast'
 
 const Header = () => {
   const [showMenu, setShowMenu] = useState(false)  // State Hook được sử dụng để giữ thông tin về trạng thái của menu hiển thị hoặc ẩn
@@ -79,7 +79,7 @@ const Header = () => {
         </div>
       </div>
     </header>
-  );
-};
+  )
+}
 
-export default Header;
+export default Header

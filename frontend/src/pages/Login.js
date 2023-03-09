@@ -1,28 +1,28 @@
-import React, { useState } from 'react';
-import loginImage from '../assets/login-user.gif';
+import React, { useState } from 'react'
+import loginImage from '../assets/login-user.gif'
 import {BiShow, BiHide} from 'react-icons/bi'
-import { Link, useNavigate } from 'react-router-dom'; //import các module cần dùng
-import { toast } from "react-hot-toast"; 
-import { useDispatch, useSelector } from 'react-redux';
-import { loginRedux } from '../redux/userSlice';
+import { Link, useNavigate } from 'react-router-dom' //import các module cần dùng
+import { toast } from "react-hot-toast" 
+import { useDispatch, useSelector } from 'react-redux'
+import { loginRedux } from '../redux/userSlice'
 
 const Login = () => {
-  const navigate = useNavigate(); //Sử dụng hook `useNavigate` để điều hướng trang
+  const navigate = useNavigate() //Sử dụng hook `useNavigate` để điều hướng trang
 
-  const [showPassword, setShowPassword] = useState(false); //state để hiển thị hoặc ẩn mật khẩu khi đăng nhập
+  const [showPassword, setShowPassword] = useState(false) //state để hiển thị hoặc ẩn mật khẩu khi đăng nhập
 
   const [data,setData] = useState({ //state lưu trữ thông tin email và password người dùng nhập vào
     email: "",
     password: ""
-  });
+  })
 
   const userData = useSelector(state => state) //Sử dụng hook `useSelector` để lấy toàn bộ state trong Redux store
 
   const dispacth = useDispatch() //Sử dụng hook `useDispatch` để gửi action đăng nhập lên Redux store
 
   const handleShowPassword = () => { //Hàm để toggle hiển thị/ẩn mật khẩu
-    setShowPassword (prev => !prev);
-  };
+    setShowPassword (prev => !prev)
+  }
 
   const handleOnChange = (e) => { //Hàm xử lý khi người dùng thay đổi giá trị trường input
     const {name, value} = e.target

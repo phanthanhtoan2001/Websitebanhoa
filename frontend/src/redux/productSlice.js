@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit"
 
 // Khởi tạo state ban đầu cho productReducer
 const initialState = {

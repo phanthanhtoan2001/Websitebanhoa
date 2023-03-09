@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
-import loginImage from '../assets/login-user.gif';
+import React, { useState } from 'react'
+import loginImage from '../assets/login-user.gif'
 import { BiShow, BiHide } from 'react-icons/bi'
-import { Link, useNavigate } from 'react-router-dom';
-import { ImagetoBase64 } from '../utility/ImagetoBase64';
-import { toast } from "react-hot-toast";
+import { Link, useNavigate } from 'react-router-dom'
+import { ImagetoBase64 } from '../utility/ImagetoBase64'
+import { toast } from "react-hot-toast"
 
 const Signup = () => {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
-  const [showPassword, setShowPassword] = useState(false); //state để hiển thị hoặc ẩn password
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false); //state để hiển thị hoặc ẩn confirmPassword
+  const [showPassword, setShowPassword] = useState(false) //state để hiển thị hoặc ẩn password
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false) //state để hiển thị hoặc ẩn confirmPassword
 
   const [data, setData] = useState({ //state chứa các thông tin nhập vào từ form
     firstName: "",
@@ -18,16 +18,16 @@ const Signup = () => {
     password: "",
     confirmPassword: "",
     image: "",
-  });
+  })
 
-  console.log(data); //In ra để kiểm tra xem dữ liệu được cập nhật trong state data hay không?
+  console.log(data) //In ra để kiểm tra xem dữ liệu được cập nhật trong state data hay không?
 
   const handleShowPassword = () => { //Hàm để hiển thị hoặc ẩn password
-    setShowPassword(prev => !prev);
-  };
+    setShowPassword(prev => !prev)
+  }
 
   const handleShowConfirmPassword = () => { //Hàm để hiển thị hoặc ẩn confirmPassword
-    setShowConfirmPassword(prev => !prev);
+    setShowConfirmPassword(prev => !prev)
   }
 
   const handleOnChange = (e) => { //Hàm để lấy giá trị từ các input và cập nhật vào state data
@@ -41,13 +41,13 @@ const Signup = () => {
   }
 
   const handleUploadProfileImage = async (e) => { //Hàm để lấy đường dẫn ảnh upload lên từ máy tính và cập nhật vào state data
-    const file = e.target.files[0];
-    const dataUrl = await ImagetoBase64(file);
+    const file = e.target.files[0]
+    const dataUrl = await ImagetoBase64(file)
     setData((prev) => ({
       ...prev,
       image: dataUrl
-    }));
-  };
+    }))
+  }
 
   console.log(process.env.REACT_APP_SERVER_DOMIN) //In ra biến môi trường REACT_APP_SERVER_DOMAIN để kiểm tra xem có chính xác không?
 
@@ -70,7 +70,7 @@ const Signup = () => {
               style: { backgroundColor: '#00FF7F', color: 'white' }
             }) // Hiển thị thông báo thành công hoặc lỗi bằng thư viện react-hot-toast
             if (dataRes.alert) { // Nếu đăng ký thành công thì redirect sang trang đăng nhập
-              navigate("/login");
+              navigate("/login")
             }
           } catch (error) {
             console.log(error.message)
