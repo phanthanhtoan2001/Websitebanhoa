@@ -24,7 +24,7 @@ const Header = () => {
     toast("Logout successfully")
   }
 
-  console.log(process.env.REACT_APP_ADMIN_EMAIL) // Log ra email của admin từ biến môi trường REACT_APP_ADMIN_EMAIL 
+  const cartItemNumber = useSelector((state) => state.product.cartItem)
 
   return (
     <header className='fixed shadow-md w-full h-32 px-2 md:px-4 z-50 bg-white' style={{ borderBottom: '2px solid #ccc' }}>
@@ -50,7 +50,9 @@ const Header = () => {
           <div className='text-2x1 text-slate-600 relative'>
             <Link to={'/cart'} className='ml-10 mx-4 text-gray-600 hover:text-red-500'>
               <FaShoppingCart size={30} />
-              < div className='absolute left-5 top-5 text-white bg-red-500 h-5 w-5 rounded-full m-0 text-sm text-center'>0</div>
+              < div className='absolute left-5 top-5 text-white bg-red-500 h-5 w-5 rounded-full m-0 text-sm text-center'>
+                {cartItemNumber.length}
+              </div>
             </Link>
           </div>
 

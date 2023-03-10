@@ -3,10 +3,10 @@ import { useSelector } from 'react-redux'
 import CardFeature from './CardFeature'
 import FilterProducts from './FilterProducts'
 
-const AllProduct = ({heading}) => {
+const AllProduct = ({ heading, loading }) => {
     const productData = useSelector((state) => state.product.productList)
 
-    const categoryList = [...new Set(productData.map((el) => el.category))];
+    const loadingArrayFeature = new Array(10).fill(null)
 
     // Một mảng các danh mục để sử dụng làm tùy chọn bộ lọc
     const categories = ["rose", "orchid", "lily", "apricot", "lotus", "hibiscus"]
@@ -37,21 +37,25 @@ const AllProduct = ({heading}) => {
             <h2 className="font-bold text-3xl text-slate-800 mb-4">
                 {heading}
             </h2>
-            <div className='flex'>
+            <div className='flex gap-4 justify-center overflow-scroll scrollbar-none'>
                 <FilterProducts categoryList={categories} onClick={(category) => handleFilterProduct(category)} />
             </div>
 
             <div className="flex flex-wrap justify-center gap-5 my-8">
-                {
-                    dataFilter.map((e) => (
-                        <CardFeature
-                            key={e._id}
-                            id={e._id}
-                            image={e.image}
-                            name={e.name}
-                            category={e.category}
-                            price={e.price}
-                        />
+                {dataFilter[0] ? (dataFilter.map((e) => (
+                    <CardFeature
+                        key={e._id}
+                        id={e._id}
+                        image={e.image}
+                        name={e.name}
+                        category={e.category}
+                        price={e.price}
+                    />
+                )
+                )) : (
+                    loadingArrayFeature.map((e, index) => (
+                        <CardFeature loading="Loading..." key={index + "cartLoading"} />
+                    )
                     ))
                 }
             </div>
