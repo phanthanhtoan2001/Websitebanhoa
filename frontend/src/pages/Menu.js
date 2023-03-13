@@ -1,6 +1,6 @@
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import AllProduct from '../components/AllProduct'
 import { addCartItem } from '../redux/productSlice'
 
@@ -35,7 +35,10 @@ const Menu = () => {
             <p className='text-center text-slate-500 font-medium capitalize text-2xl' style={{ fontStyle: 'italic' }}>{productDisplay.category}</p>
             <p className='text-center font-bold text-2xl'><span>{productDisplay.price}</span><span className='text-green-600'> VNĐ</span></p>
             <div className='flex gap-3 justify-center'>
-              <button className='bg-red-400 hover:bg-blue-300 mt-4 py-1 rounded-md min-w-[100px]'>Buy</button>
+              <Link to={{ pathname: '/cart', search: `?add=${productDisplay._id}`, }}
+                className='bg-yellow-400 hover:bg-green-300 mt-4 py-1 rounded-md min-w-[100px] text-center' onClick={handleAddCartProduct}>
+                Buy
+              </Link>
               <button className='bg-yellow-400 hover:bg-green-300 mt-4 py-1 rounded-md min-w-[100px]' onClick={handleAddCartProduct}>Add to Cart</button>
             </div>
             <div className='px-2'>

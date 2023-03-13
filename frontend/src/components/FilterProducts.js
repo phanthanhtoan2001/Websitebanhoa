@@ -23,7 +23,7 @@ const FilterProducts = ({ categoryList, onClick }) => {
             {categoryList.map((category) => (
                 <div key={category} className="flex flex-col items-center" style={{ width: "10rem" }}>
                     <div onClick={() => onClick(category)}>
-                        <div className="text-3xl p-5 bg-yellow-500 rounded-full inline-flex items-center justify-center cursor-pointer">
+                        <div className="text-3xl p-5 bg-yellow-500 hover:bg-red-400 rounded-full inline-flex items-center justify-center cursor-pointer">
                             {category === "rose" && (
                                 <img src={RoseIcon} alt="Rose icon" className="w-16 h-16" />
                             )}
