@@ -1,16 +1,36 @@
-import React from 'react';
-import { useSelector } from 'react-redux';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import CartProduct from '../components/CartProduct';
 import emptyCart from '../assets/empty-cart.gif';
+import { setDataProduct } from '../redux/productSlice';
 
 const Cart = () => {
     const productCartItem = useSelector((state) => state.product.cartItem)
-    console.log(productCartItem)
-
-    const totalPrice = productCartItem.reduce((acc, curr) => parseFloat(acc.toString().replace(/\./g, '').replace(',', '.')) + parseFloat(curr.total.replace(/\./g, '').replace(',', '.')), 0);
-    console.log(totalPrice.toLocaleString('vi-VN', { minimumFractionDigits: 0 }));
-
+    const totalPrice = productCartItem.reduce(
+        (acc, curr) =>
+            parseFloat(acc.toString().replace(/\./g, '').replace(',', '.')) +
+            parseFloat(curr.total.replace(/\./g, '').replace(',', '.')),
+        0
+    )
     const totalQuantity = productCartItem.reduce((acc, curr) => acc + parseInt(curr.quanity), 0)
+
+    useEffect(() => {
+        // Get latest cart data from local storage
+        const email = process.env.REACT_APP_LOCAL_STORAGE_KEY;
+        const currentCart = JSON.parse(localStorage.getItem(email)) || [];
+
+        // Dispatch new cart data if not empty
+        if (currentCart.length > 0) {
+            console.log('Current cart:', currentCart);
+            setDataProduct(setDataProduct(currentCart), null, currentCart); // pass in cart data as third argument
+        }
+    }, []);
+
+    // Update local storage whenever cart data changes
+    useEffect(() => {
+        const email = process.env.REACT_APP_LOCAL_STORAGE_KEY
+        localStorage.setItem(email, JSON.stringify(productCartItem))
+    }, [productCartItem])
 
     return (
         <>
@@ -54,11 +74,11 @@ const Cart = () => {
                             <button className='w-full text-2xl font-bold py-2 text-white bg-red-400 mt-auto'>Payment</button>
                         </div>
                     </div> : <>
-                    <div className='flex flex-col w-full justify-center items-center'>
+                        <div className='flex flex-col w-full justify-center items-center'>
                             <img src={emptyCart} className='w-full max-w-sm' />
                             <p className='text-slate-500 text-3xl font-bold'>Empty Cart</p>
-                    </div>
-                    </>    
+                        </div>
+                    </>
                 }
             </div>
         </>
