@@ -5,7 +5,7 @@ import emptyCart from '../assets/empty-cart.gif';
 import { setDataProduct } from '../redux/productSlice';
 
 const Cart = () => {
-    const productCartItem = useSelector((state) => state.product.cartItem)
+    const productCartItem = useSelector((state) => state.product.cartItem) // Lấy cart item từ redux store
     const totalPrice = productCartItem.reduce(
         (acc, curr) =>
             parseFloat(acc.toString().replace(/\./g, '').replace(',', '.')) +
@@ -14,23 +14,28 @@ const Cart = () => {
     )
     const totalQuantity = productCartItem.reduce((acc, curr) => acc + parseInt(curr.quanity), 0)
 
+    const dispatch = useDispatch()
+
+    // Sử dụng hook useEffect để lấy dữ liệu từ local storage
     useEffect(() => {
-        // Get latest cart data from local storage
-        const email = process.env.REACT_APP_LOCAL_STORAGE_KEY;
-        const currentCart = JSON.parse(localStorage.getItem(email)) || [];
+        // Lấy email của user từ biến môi trường
+        const email = process.env.REACT_APP_LOCAL_STORAGE_KEY
+        // Lấy cart data từ local storage, nếu không có sẽ trả về một mảng rỗng
+        const currentCart = JSON.parse(localStorage.getItem(email)) || []
 
-        // Dispatch new cart data if not empty
+        // Nếu cart data lấy từ local storage không rỗng, gửi action để cập nhật cart trong redux store
         if (currentCart.length > 0) {
-            console.log('Current cart:', currentCart);
-            setDataProduct(setDataProduct(currentCart), null, currentCart); // pass in cart data as third argument
+            console.log('Current cart:', currentCart)
+            dispatch(setDataProduct(currentCart)) // Truyền cart data như một đối số vào action
         }
-    }, []);
+    }, [dispatch])
 
-    // Update local storage whenever cart data changes
+    // Sử dụng hook useEffect để lưu dữ liệu vào local storage khi cart data trong redux store thay đổi
     useEffect(() => {
         const email = process.env.REACT_APP_LOCAL_STORAGE_KEY
-        localStorage.setItem(email, JSON.stringify(productCartItem))
+        localStorage.setItem(email, JSON.stringify(productCartItem)) // Lưu cart data thành chuỗi JSON vào local storage
     }, [productCartItem])
+
 
     return (
         <>

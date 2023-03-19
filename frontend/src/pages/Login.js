@@ -58,7 +58,7 @@ const Login = () => {
           console.log(dataRes)
           // Hiển thị thông báo server trả về
           toast(dataRes.message)  // Kiểm tra response từ server để xác định thành công hay thất bại
-          if (dataRes.alert) { 
+          if (dataRes.alert) {
             //Nếu đăng nhập thành công, gửi action thông qua dispatch(), chuyển về trang chủ sau 1s
             dispacth(loginRedux(dataRes))
             setTimeout(() => {
@@ -70,7 +70,7 @@ const Login = () => {
       } catch (error) {
         console.log(error)
       }
-    } else { 
+    } else {
       //Nếu không đầy đủ email hoặc password, hiển thị thông báo yêu cầu nhập đủ
       alert('Please enter required fields')
     }
@@ -92,6 +92,12 @@ const Login = () => {
             <input type={showPassword ? "text" : "password"} id={"password"} name={"password"} className='w-full bg-slate-200 px-8 py-2 border-none outline-none' value={data.password} onChange={handleOnChange} />
             <span className='flex text-xl py-3 cursor-pointer' onClick={handleShowPassword}>{showPassword ? <BiShow /> : <BiHide />}</span> {/* icon để hiển thị hoặc ẩn mật khẩu */}
           </div>
+
+          <p className='text-right p-2'>
+            <Link to='/forgetpassword' className='text-slate-500'>
+              <u>Forget Password?</u>
+            </Link>
+          </p>
 
           <div style={{ display: 'flex', justifyContent: 'center' }} className='flex py-3'>
             <button className="w-full max-w-[150px] bg-blue-500 hover:bg-green-400 text-white font-bold py-2 px-4 rounded-full">

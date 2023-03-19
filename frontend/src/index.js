@@ -15,6 +15,8 @@ import { store } from './redux/index'
 import { Provider } from 'react-redux'
 import Cart from './pages/Cart'
 import UpdateProduct from './pages/UpdateProduct'
+import ForgetPassword from './pages/ForgetPassword'
+import ResetPassword from './pages/ResetPassword'
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -29,6 +31,8 @@ const router = createBrowserRouter(
       <Route path='signup' element={<Signup />} />
       <Route path='cart' element={<Cart />} />
       <Route path='updateproduct/:id' element={<UpdateProduct />} />
+      <Route path='forgetpassword' element={<ForgetPassword />} />
+      <Route path='resetpassword/:token' element={<ResetPassword />} />
     </Route>
   )
 )

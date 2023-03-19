@@ -5,19 +5,25 @@ import { toast } from 'react-hot-toast'
 import { useNavigate, useParams } from 'react-router-dom';
 
 const UpdateProduct = () => {
+  // useState để lưu giữ các state của component, bao gồm tên, danh mục, ảnh, giá và mô tả sản phẩm
   const [name, setName] = React.useState('')
   const [category, setCategory] = React.useState('')
   const [image, setImage] = React.useState('')
   const [price, setPrice] = React.useState('')
   const [description, setDescription] = React.useState('')
 
+  // Sử dụng hook useParams để lấy giá trị tham số trên URL
   const params = useParams()
-  const navigate = useNavigate
 
+  // Sử dụng hook useNavigate để điều hướng sang trang khác
+  const navigate = useNavigate()
+
+  // Sử dụng useEffect để gọi API và lấy chi tiết sản phẩm dựa trên tham số trên URL khi component được render
   useEffect(() => {
     getProductDetail()
   }, [])
 
+  // Gọi API để lấy chi tiết sản phẩm dựa trên tham số trên URL và cập nhật các state tương ứng
   const getProductDetail = async () => {
     console.warn(params)
     let result = await fetch(`${process.env.REACT_APP_SERVER_DOMAIN}/product/${params.id}`)
@@ -30,10 +36,11 @@ const UpdateProduct = () => {
     setDescription(result.description)
   }
 
+  // Hàm xử lý khi người dùng click nút cập nhật sản phẩm
   const handleUpdateProduct = async () => {
     console.warn(name, category, image, price, description)
 
-    // Kiểm tra điều kiện
+    // Kiểm tra điều kiện để đảm bảo các trường bắt buộc được điền và giá tiền hợp lệ
     if (!name || !category || !image || !description) {
       toast("Enter required fields")
       return;
@@ -43,6 +50,7 @@ const UpdateProduct = () => {
     }
 
     try {
+      // Gọi API để cập nhật thông tin sản phẩm
       let result = await fetch(`${process.env.REACT_APP_SERVER_DOMAIN}/product/${params.id}`, {
         method: 'PUT',
         body: JSON.stringify({ name, category, image, price, description }),
@@ -51,7 +59,7 @@ const UpdateProduct = () => {
         }
       })
       result = await result.json()
-      window.location.href = '/'
+      navigate('/') // Điều hướng về trang chủ sau khi cập nhật thành công
     } catch (err) {
       console.error(err)
     }
