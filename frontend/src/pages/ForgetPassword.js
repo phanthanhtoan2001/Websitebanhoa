@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { toast } from 'react-hot-toast'
 import loginImage from '../assets/login-user.gif'
 
 const ForgetPassword = () => {
@@ -19,7 +20,10 @@ const ForgetPassword = () => {
                 })
             })
             if (response.ok) {
-                navigate(`/resetpassword/${email}`)
+                toast("Please check your email to get otp", {
+                    style: { background: 'green', color: 'white' }
+                  })
+                navigate('/login')
             }
         } catch (error) {
             console.log(error);

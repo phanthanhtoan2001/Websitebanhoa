@@ -39,12 +39,12 @@ export const productSlice = createSlice({
             if (window.confirm('Bạn có muốn xóa sản phẩm này?')) {
                 toast("One Item Delete");
                 const index = state.cartItem.findIndex((e) => e._id === action.payload)
-                state.cartItem.splice(index, 1)
-                console.log(index);
-                // Xóa sản phẩm khỏi giỏ hàng trong localStorage
+                state.cartItem.splice(index, 1);
+
+                // Cập nhật giỏ hàng trong localStorage
                 const email = process.env.REACT_APP_LOCAL_STORAGE_KEY;
                 const currentCart = JSON.parse(localStorage.getItem(email)) || [];
-                const newCart = currentCart.filter((item) => item._id !== action.payload);
+                const newCart = Array.isArray(currentCart) ? currentCart.filter((item) => item._id !== action.payload) : [];
                 localStorage.setItem(email, JSON.stringify(newCart));
             }
         },
@@ -63,16 +63,18 @@ export const productSlice = createSlice({
             // Cập nhật giỏ hàng trong localStorage
             const email = process.env.REACT_APP_LOCAL_STORAGE_KEY;
             const currentCart = JSON.parse(localStorage.getItem(email)) || [];
-            const updatedCart = currentCart.map((item) => {
-                if (item._id === action.payload) {
-                    return {
-                        ...item,
-                        quanity: qtyInc,
-                        total: total,
-                    };
-                }
-                return item;
-            });
+            const updatedCart = Array.isArray(currentCart)
+                ? currentCart.map((item) => {
+                    if (item._id === action.payload) {
+                        return {
+                            ...item,
+                            quanity: qtyInc,
+                            total: total,
+                        };
+                    }
+                    return item;
+                })
+                : [];
             localStorage.setItem(email, JSON.stringify(updatedCart));
         },
         decreaseQuanity: (state, action) => {

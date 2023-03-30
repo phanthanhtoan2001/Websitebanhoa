@@ -17,6 +17,7 @@ import Cart from './pages/Cart'
 import UpdateProduct from './pages/UpdateProduct'
 import ForgetPassword from './pages/ForgetPassword'
 import ResetPassword from './pages/ResetPassword'
+import Payment from './pages/Payment'
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -33,6 +34,7 @@ const router = createBrowserRouter(
       <Route path='updateproduct/:id' element={<UpdateProduct />} />
       <Route path='forgetpassword' element={<ForgetPassword />} />
       <Route path='resetpassword/:token' element={<ResetPassword />} />
+      <Route path='payment' element={<Payment />} />
     </Route>
   )
 )

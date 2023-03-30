@@ -4,6 +4,7 @@ const mongoose = require("mongoose")
 const dotenv = require("dotenv")
 const nodemailer = require("nodemailer")
 const jwt = require("jsonwebtoken")
+const bcrypt = require('bcrypt')
 
 const accessTokenSecret = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
 
@@ -49,16 +50,27 @@ app.get("/signup", (req, res) => {
 })
 
 app.post('/signup', async (req, res) => {
-  const { email } = req.body
+  const { email, password } = req.body
   try {
     const result = await userModel.findOne({ email: email })
     if (result) {
-      res.status(400).json({ message: 'Email already registered', alert: false })
+      res.status(400).json({
+        message: 'Email already registered',
+        alert: false
+      })
     } else {
-      const newUser = new userModel(req.body)
+      const hashedPassword = await bcrypt.hash(password, 10) // Hash password using bcrypt
+      const newUser = new userModel({
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+        email: email,
+        password: hashedPassword,
+        image: req.body.image,
+        verifytoken: req.body.verifytoken
+      })
       await newUser.save()
       res.status(200).json({
-        message: 'User data has been successfully stored',
+        message: 'You have successfully registered',
         alert: true,
       })
     }
@@ -66,23 +78,24 @@ app.post('/signup', async (req, res) => {
     console.log(err)
     res.status(500).json({
       message: 'Error occurred while saving user data',
-      alert: false,
+      alert: false
     })
   }
 })
 
 // Login page
 app.get("/login", (req, res) => {
-  res.send("This is the login page.") // Gửi phản hồi bằng văn bản
+  res.send("This is the login page.")
 })
 
 app.post('/login', async (req, res) => {
   console.log(req.body)
   const { email, password } = req.body
+
   try {
     const result = await userModel.findOne({ email: email })
 
-    if (result && result.password === password) { // So sánh mật khẩu nhập vào với mật khẩu trong database
+    if (result && await bcrypt.compare(password, result.password)) { // Compare input password with hash from database
       const dataSend = {
         _id: result._id,
         firstName: result.firstName,
@@ -98,7 +111,8 @@ app.post('/login', async (req, res) => {
         background: '#00FF7F',
         color: 'white'
       })
-    } else { // Không tìm thấy người dùng hoặc mật khẩu không khớp
+    } else {
+      // Email or password incorrect
       res.send({
         message: 'Email or Password is incorrect',
         alert: false,
@@ -204,10 +218,13 @@ app.post('/verify-otp', async (req, res) => {
       return res.status(404).json({ message: "User not found!" });
     }
 
-    // Đặt mật khẩu mới và xóa mã thông báo xác minh
-    user.password = newPassword;
-    user.verifytoken = '';
-    await user.save();
+     // Hash mật khẩu mới
+     const hashedPassword = await bcrypt.hash(newPassword, 10); 
+
+     // Cập nhật mật khẩu đã được mã hóa vào CSDL và xóa đường dẫn xác thực
+     user.password = hashedPassword;
+     user.verifytoken = accessTokenSecret;
+     await user.save();
 
     return res.status(200).json({ message: "Password has been reset successfully!" });
   } catch (error) {
@@ -215,8 +232,6 @@ app.post('/verify-otp', async (req, res) => {
     return res.status(500).json({ message: "OTP verification failed!" });
   }
 });
-
-
 
 // Xác định lược đồ sản phẩm cho mongoose
 const schemaProduct = mongoose.Schema({
@@ -255,8 +270,7 @@ app.post("/uploadProduct", async (req, res) => {
   }
 })
 
-
-//  Product page
+// Product page
 app.get("/product", async (req, res) => {
   const data = await productModel.find({})
   res.send(data)
@@ -285,6 +299,129 @@ app.delete("/product/:id", async (req, res) => {
   let data = await productModel.deleteOne({ _id: req.params.id })
   res.send(data)
 })
+
+// const schemaCart = new mongoose.Schema(
+//   {
+//     userId: {
+//       type: mongoose.Schema.Types.ObjectId,
+//       ref: "user",
+//       required: true,
+//     },
+//     cartItems: [
+//       {
+//         productId: {
+//           type: mongoose.Schema.Types.ObjectId,
+//           ref: "product",
+//           required: true,
+//         },
+//         quantity: { type: Number, default: 1 },
+//       },
+//     ],
+//     createdAt: { type: Date, default: Date.now() },
+//   },
+//   { timestamps: true }
+// );
+
+// const cartModel = mongoose.model("cart", schemaCart);
+
+// // Thêm sản phẩm vào giỏ hàng
+// app.post("/cart/add-cart", async (req, res) => {
+//   // Thêm sản phẩm vào giỏ hàng
+//   const { userId, productId } = req.body;
+
+//   // Tìm giỏ hàng đã có
+//   let cart = await cartModel.findOne({ userId });
+
+//   // Nếu không có, tạo mới giỏ hàng
+//   if (!cart) {
+//     cart = new Cart({ userId, cartItems: [{ product: productId }] });
+//   } else {
+//     // Nếu có rồi, thêm sản phẩm vào giỏ hàng
+//     const index = cart.cartItems.findIndex(
+//       (item) => item.productId.toString() === productId
+//     )
+//     if (index !== -1) {
+//       // Nếu sản phẩm đã có trong giỏ hàng, chỉ cần tăng số lượng lên 1
+//       cart.cartItems[index].quantity += 1;
+//     } else {
+//       // Nếu sản phẩm chưa có, thêm mới vào danh sách
+//       cart.cartItems.push({ product: productId })
+//     }
+//   }
+
+//   // Lưu giỏ hàng và trả về kết quả
+//   await cart.save()
+//   res.json(cart)
+// })
+
+// app.post("/cart/remove-item-cart", async (req, res) => {
+//   const { userId, productId } = req.body;
+
+//   // Tìm giỏ hàng
+//   const cart = await cartModel.findOne({ userId });
+//   if (!cart) {
+//     return res.json({ success: false, message: "Cart not found" });
+//   }
+
+//   // Xóa sản phẩm khỏi danh sách
+//   cart.cartItems = cart.cartItems.filter(
+//     (item) => item.productId.toString() !== productId
+//   );
+
+//   // Lưu giỏ hàng và trả về kết quả
+//   await cart.save();
+//   res.json(cart);
+// })
+
+const purchaseSchema = new mongoose.Schema({
+  // Define the properties of a purchase object
+  fullname: String,
+  email: String,
+  address: String,
+  phone: String,
+  deliveryDate: Date,
+  notice: String,
+  paymentMethod: String,
+  products: [{
+    name: String,
+    category: String,
+    quantity: Number,
+    total: Number
+  }]
+});
+
+const purchaseModel = mongoose.model('Purchase', purchaseSchema);
+module.exports = purchaseModel
+
+app.post('/purchase', async (req, res) => {
+  try {
+    // Get the user ID from the logged-in user's session or JWT token
+    const userId = req.session.userId;
+
+    // Create a new purchase object from the received data
+    const newPurchase = new Purchase({
+      fullname: req.body.fullname,
+      email: req.body.email,
+      address: req.body.address,
+      phone: req.body.phone,
+      deliveryDate: req.body.delivery,
+      notice: req.body.message,
+      paymentMethod: req.body.paymentMethod,
+      products: req.body.products
+    });
+
+    // Find the user by ID and add the new purchase to their purchases array
+    const user = await userModel.findById(userId);
+    user.purchases.push(newPurchase);
+    await user.save();
+
+    // Send a response back to the frontend indicating success
+    res.json({ message: 'Purchase saved successfully' });
+  } catch (error) {
+    // Handle errors and send a response back to the frontend indicating failure
+    res.status(500).json({ error: 'Failed to save purchase' });
+  }
+});
 
 // Khởi động máy chủ
 app.listen(PORT, () => {
