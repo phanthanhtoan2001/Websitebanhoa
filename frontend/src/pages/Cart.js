@@ -4,7 +4,7 @@ import CartProduct from '../components/CartProduct';
 import emptyCart from '../assets/empty-cart.gif';
 import { Link } from 'react-router-dom';
 
-const Cart = () => {
+function Cart() {
     const productCartItem = useSelector((state) => state.product.cartItem) // Lấy cart item từ redux store
     const totalPrice = productCartItem.reduce(
         (acc, curr) => acc + parseFloat(curr.total.replace(/\./g, '').replace(',', '.')),
@@ -12,12 +12,7 @@ const Cart = () => {
     ).toLocaleString('vi', { style: 'decimal', minimumFractionDigits: 0 })
     const totalQuantity = productCartItem.reduce((acc, curr) => acc + parseInt(curr.quanity), 0)
 
-    // Define this function somewhere in your codebase to check if the user is logged in
-    function isUserLoggedIn() {
-        const loggedInStatus = localStorage.getItem('isLoggedIn')
-        return !!loggedInStatus // This converts a truthy/falsy value to a boolean
-    }
-
+    const isLoggedIn = useSelector((state) => state.user.isLoggedIn)
 
     return (
         <>
@@ -59,9 +54,11 @@ const Cart = () => {
                                 </div>
                             </div>
                             <div className='w-full text-2xl font-bold py-2 text-white bg-red-400 mt-auto text-center'>
-                                <Link to={isUserLoggedIn() ? "/payment" : "/login"}>
-                                    <button>{isUserLoggedIn() ? "Add Information" : "Log in to continue"}</button>
-                                </Link>
+                                {isLoggedIn ? (
+                                    <Link to="/payment">Add Information</Link>
+                                ) : (
+                                    <Link to="/login">Log in to continue</Link>
+                                )}
                             </div>
                         </div>
                     </div> : <>

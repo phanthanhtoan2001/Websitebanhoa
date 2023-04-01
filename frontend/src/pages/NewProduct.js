@@ -70,7 +70,7 @@ const NewProduct = () => {
       })
 
       if (!data.price.includes(".")) {
-        toast("Please enter a valid price", {
+        toast("Please enter a valid price have '.'", {
           style: { background: 'red', color: 'white' }
         })
       }  // Thông báo khi giá không hợp lệ
