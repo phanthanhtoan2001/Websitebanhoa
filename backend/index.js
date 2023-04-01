@@ -244,7 +244,6 @@ const schemaProduct = mongoose.Schema({
 
 // Tạo một mô hình sản phẩm với lược đồ đã xác định
 const productModel = mongoose.model("product", schemaProduct)
-
 // Lưu product trong db
 app.post("/uploadProduct", async (req, res) => {
   const { name, category, image, price, description } = req.body // Trích xuất thông tin sản phẩm từ body của yêu cầu
@@ -422,6 +421,11 @@ app.post('/purchase', async (req, res) => {
     res.status(500).json({ error: 'Failed to save purchase' });
   }
 });
+//Admin - user 
+app.get("/listuser", async (req, res) => {
+  const data = await userModel.find({})
+  res.send(data)
+})
 
 // Khởi động máy chủ
 app.listen(PORT, () => {
