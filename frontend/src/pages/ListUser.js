@@ -38,7 +38,7 @@ const ListUser = () => {
   // Generate table rows
   const myList = currentItems.map((item) => {
     return (
-      <tr key={item.id} style={{ padding: "8px", textAlign: "center", border: "1px solid black", backgroundColor: "#f2f2f2" }}>
+      <tr key={item.id} style={{  padding: "8px", textAlign: "center", border: "1px solid black", backgroundColor: "#f2f2f2" }}>
         {item.image !== "" ?
           <td style={{ padding: "8px",display:"flex",justifyContent:"center" }}><img style={{ width: "5vw", height: "5vh" }} src={item.image}></img></td>
           : <td style={{ padding: "8px" ,display:"flex",justifyContent:"center"}}><img style={{ width: "5vw", height: "5vh" }} src="https://static.vecteezy.com/system/resources/previews/008/442/086/original/illustration-of-human-icon-user-symbol-icon-modern-design-on-blank-background-free-vector.jpg"></img></td>
@@ -51,7 +51,7 @@ const ListUser = () => {
 
   return (
     <div className="search" style={{backgroundColor:"white"}}>
-      <div style={{ display:"flex",justifycontent: "center"}}>
+      <div style={{ display:"flex",justifyContent:"center",padding:"10px 0 10px 0",}}>
         <label>Tìm kiếm:</label>
         <input style={{border:"1px solid black",borderRadius:"5px",textAlign:"center"}} type="text" placeholder="Search users..." value={query} onChange={(e) => setQuery(e.target.value)} />
       </div>
