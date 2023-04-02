@@ -1,0 +1,11 @@
+{
+  "name": "-q",
+  "version": "1.0.0",
+  "description": "1. Account\r 2. Product\r 3. Staff\r 4. Cart\r 5. Payment",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
