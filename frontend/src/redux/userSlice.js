@@ -11,9 +11,9 @@ let initialState = {
     _id: "",
 }
 
-// Lấy dữ liệu từ LocalStorage nếu đã lưu trước đó
-if (localStorage.getItem(LOCAL_STORAGE_KEY)) {
-    initialState = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY))
+// Lấy dữ liệu từ sessionStorage nếu đã lưu trước đó
+if (sessionStorage.getItem(LOCAL_STORAGE_KEY)) {
+    initialState = JSON.parse(sessionStorage.getItem(LOCAL_STORAGE_KEY))
 }
 
 // Tạo một slice trạng thái bằng cách chỉ định tên, trạng thái ban đầu và bộ giảm tốc
@@ -33,8 +33,8 @@ export const userSlice = createSlice({
             state.email = action.payload.data.email
             state.image = action.payload.data.image
 
-            // Lưu thông tin đăng nhập vào localStorage
-            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state))
+            // Lưu thông tin đăng nhập vào sessionStorage
+            sessionStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state))
         },
 
         // Xác định chức năng logoutRedux reducer
@@ -47,8 +47,8 @@ export const userSlice = createSlice({
             state.email = ""
             state.image = ""
 
-            // Xóa thông tin đăng nhập khỏi localStorage
-            localStorage.removeItem(LOCAL_STORAGE_KEY)
+            // Xóa thông tin đăng nhập khỏi sessionStorage
+            sessionStorage.removeItem(LOCAL_STORAGE_KEY)
         },
 
         // Add a function to check if the user is logged in

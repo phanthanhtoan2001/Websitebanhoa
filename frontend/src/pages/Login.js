@@ -40,8 +40,8 @@ const Login = () => {
     const { email, password } = data
     if (email && password) { //Nếu đầy đủ cả email và password thì gửi request lên server kiểm tra đăng nhập
       try {
-        let userState = JSON.parse(localStorage.getItem(`${process.env.REACT_APP_LOCAL_STORAGE_KEY}/`))
-        if (userState) {  // Kiểm tra nếu có thông tin đăng nhập trong localStorage
+        let userState = JSON.parse(sessionStorage.getItem(`${process.env.REACT_APP_LOCAL_STORAGE_KEY}/`))
+        if (userState) {  // Kiểm tra nếu có thông tin đăng nhập trong sessionStorage
           dispacth(loginRedux(userState))
           setTimeout(() => {
             navigate("/")
