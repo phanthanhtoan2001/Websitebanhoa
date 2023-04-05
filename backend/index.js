@@ -1,3 +1,4 @@
+
 const express = require("express")
 const cors = require("cors")
 const mongoose = require("mongoose")
@@ -5,6 +6,7 @@ const dotenv = require("dotenv")
 const nodemailer = require("nodemailer")
 const jwt = require("jsonwebtoken")
 const bcrypt = require('bcrypt')
+
 
 const accessTokenSecret = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
 
@@ -40,6 +42,7 @@ const userSchema = mongoose.Schema({
 const userModel = new mongoose.model("user", userSchema) // Tạo model instance cho User schema để tương tác với MongoDB
 module.exports = userModel // Xuất UserModel để sử dụng ở nơi khác trong ứng dụng
 
+
 app.get("/", (req, res) => {
   res.send("Server is running")  // Gửi phản hồi bằng văn bản
 })
@@ -50,27 +53,16 @@ app.get("/signup", (req, res) => {
 })
 
 app.post('/signup', async (req, res) => {
-  const { email, password } = req.body
+  const { email } = req.body
   try {
     const result = await userModel.findOne({ email: email })
     if (result) {
-      res.status(400).json({
-        message: 'Email already registered',
-        alert: false
-      })
+      res.status(400).json({ message: 'Email already registered', alert: false })
     } else {
-      const hashedPassword = await bcrypt.hash(password, 10) // Hash password using bcrypt
-      const newUser = new userModel({
-        firstName: req.body.firstName,
-        lastName: req.body.lastName,
-        email: email,
-        password: hashedPassword,
-        image: req.body.image,
-        verifytoken: req.body.verifytoken
-      })
+      const newUser = new userModel(req.body)
       await newUser.save()
       res.status(200).json({
-        message: 'You have successfully registered',
+        message: 'User data has been successfully stored',
         alert: true,
       })
     }
@@ -78,10 +70,11 @@ app.post('/signup', async (req, res) => {
     console.log(err)
     res.status(500).json({
       message: 'Error occurred while saving user data',
-      alert: false
+      alert: false,
     })
   }
 })
+
 
 // Login page
 app.get("/login", (req, res) => {
@@ -218,13 +211,17 @@ app.post('/verify-otp', async (req, res) => {
       return res.status(404).json({ message: "User not found!" });
     }
 
-     // Hash mật khẩu mới
-     const hashedPassword = await bcrypt.hash(newPassword, 10); 
+    // Hash mật khẩu mới
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-     // Cập nhật mật khẩu đã được mã hóa vào CSDL và xóa đường dẫn xác thực
-     user.password = hashedPassword;
-     user.verifytoken = accessTokenSecret;
-     await user.save();
+    // Cập nhật mật khẩu đã được mã hóa vào CSDL và xóa đường dẫn xác thực
+    user.password = hashedPassword;
+    user.verifytoken = accessTokenSecret;
+    await user.save();
+    // Đặt mật khẩu mới và xóa mã thông báo xác minh
+    user.password = newPassword;
+    user.verifytoken = '';
+    await user.save();
 
     return res.status(200).json({ message: "Password has been reset successfully!" });
   } catch (error) {
@@ -270,6 +267,7 @@ app.post("/uploadProduct", async (req, res) => {
 })
 
 // Product page
+//  Product page
 app.get("/product", async (req, res) => {
   const data = await productModel.find({})
   res.send(data)
@@ -427,7 +425,91 @@ app.get("/listuser", async (req, res) => {
   res.send(data)
 })
 
-// Khởi động máy chủ
-app.listen(PORT, () => {
-  console.log(`Webflowwer app is listening at http://localhost:${PORT}`)
-})
+  const billdetailSchema = mongoose.Schema({
+    productid: mongoose.Schema.Types.ObjectId,
+    billid: mongoose.Schema.Types.ObjectId,
+    quantity: Number
+  })
+
+  const billdetailModel = new mongoose.model("Billdetail", billdetailSchema) // Tạo model instance cho User schema để tương tác với MongoDB
+  module.exports = billdetailModel // Xuất billdetail để sử dụng ở nơi khác trong ứng dụng
+
+
+  const createbilldetail = function (productid, billid, quantity) {
+    const billdetail = new billdetailModel({
+      productid,
+      billid,
+      quantity
+    });
+
+    return billdetail.save();
+  };
+
+  const billSchema = mongoose.Schema({
+    userid: mongoose.Schema.Types.ObjectId,
+    total: String,
+    date: String,
+    note: String,
+    method: String,
+    address: String,
+  })
+
+  const billModel = new mongoose.model("Bill", billSchema) // Tạo model instance cho User schema để tương tác với MongoDB
+  module.exports = billModel // Xuất billdetail để sử dụng ở nơi khác trong ứng dụng
+
+
+  const createbill = function (userid, total, date, note, method, address) {
+    const billdetail = new billModel({
+      userid,
+      total,
+      date,
+      note,
+      method,
+      address
+    });
+
+    return billdetail.save();
+  };
+
+  app.post('/checkout', async (req, res) => {
+
+
+    const { productCartItem, userid, totalPrice, Note, paymentMethod, address } = req.body
+    try {
+      var today = new Date()
+      if (today.getMonth() + 1 < 10)
+        var month = '0' + (today.getMonth() + 1)
+      else var month = today.getMonth()
+      if (today.getDate() < 10)
+        var dates = '0' + today.getDate()
+
+      else var dates = today.getDate()
+      date = today.getFullYear() + '/' + month + '/' + dates;
+      await createbill(userid, totalPrice, date, Note, paymentMethod, address)
+        .then(bill => {
+
+
+          let idbill = bill._id
+          console.log("> Created new billid\n", idbill);
+          productCartItem.map(async e => {
+            let productid = e._id
+            let quantity = e.quanity
+            createbilldetail(productid, idbill, quantity)
+              .then(billdetail => {
+                console.log("> Created new Customer\n", billdetail);
+              })
+          })
+        })
+      res.status(200).json({
+        message: 'bill create has been successfully stored',
+        alert: true,
+      })
+    }
+    catch (err) { console.log(err) }
+
+  })
+
+  // Khởi động máy chủ
+  app.listen(PORT, () => {
+    console.log(`Webflowwer app is listening at http://localhost:${PORT}`)
+  })

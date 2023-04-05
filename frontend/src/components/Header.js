@@ -54,6 +54,7 @@ const Header = () => {
             Chart Product
           </Link>}
           
+
           <div className='text-2x1 text-slate-600 relative'>
             <Link to={'/cart'} className='ml-10 mx-4 text-gray-600 hover:text-red-500'>
               <FaShoppingCart size={30} />
