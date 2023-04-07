@@ -17,8 +17,6 @@ const Login = () => {
     password: ""
   })
 
-  const userData = useSelector(state => state) //Sử dụng hook `useSelector` để lấy toàn bộ state trong Redux store
-
   const dispacth = useDispatch() //Sử dụng hook `useDispatch` để gửi action đăng nhập lên Redux store
 
   const handleShowPassword = () => { //Hàm để toggle hiển thị/ẩn mật khẩu

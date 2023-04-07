@@ -10,7 +10,7 @@ const accessTokenSecret = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0
 
 const app = express() // Tạo instance của Express app
 app.use(cors())
-app.use(express.json({ limit: "10mb" })) // Phân tích cú pháp dữ liệu JSON trong các yêu cầu có kích thước tối đa là 10 MB
+app.use(express.json({ limit: "100mb" })) // Phân tích cú pháp dữ liệu JSON trong các yêu cầu có kích thước tối đa là 10 MB
 
 dotenv.config() // Nạp các biến môi trường vào đối tượng process.env  
 
@@ -89,13 +89,14 @@ app.get("/login", (req, res) => {
 })
 
 app.post('/login', async (req, res) => {
-  console.log(req.body)
   const { email, password } = req.body
 
   try {
     const result = await userModel.findOne({ email: email })
 
     if (result && await bcrypt.compare(password, result.password)) { // Compare input password with hash from database
+      const token = jwt.sign({ email: result.email }, accessTokenSecret); // Xuất JWT với payload là email
+
       const dataSend = {
         _id: result._id,
         firstName: result.firstName,
@@ -108,6 +109,7 @@ app.post('/login', async (req, res) => {
         message: 'Login is successful',
         alert: true,
         data: dataSend,
+        token: token, // Gửi JWT về phía client
         background: '#00FF7F',
         color: 'white'
       })
@@ -130,6 +132,7 @@ app.post('/login', async (req, res) => {
     })
   }
 })
+
 
 // Lấy thông tin tài khoản người dùng
 app.get("/users/:userId", async (req, res) => {
@@ -204,7 +207,7 @@ app.post('/send-otp', async (req, res) => {
 // POST yêu cầu xác thực OTP và reset mật khẩu
 app.post('/verify-otp', async (req, res) => {
   try {
-    const { token, otp, newPassword } = req.body;
+    image.pngimage.png
 
     // Xác minh mã thông báo OTP bằng mã OTP đầu vào
     const decodedToken = jwt.verify(token, accessTokenSecret);
@@ -218,13 +221,13 @@ app.post('/verify-otp', async (req, res) => {
       return res.status(404).json({ message: "User not found!" });
     }
 
-     // Hash mật khẩu mới
-     const hashedPassword = await bcrypt.hash(newPassword, 10); 
+    // Hash mật khẩu mới
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-     // Cập nhật mật khẩu đã được mã hóa vào CSDL và xóa đường dẫn xác thực
-     user.password = hashedPassword;
-     user.verifytoken = accessTokenSecret;
-     await user.save();
+    // Cập nhật mật khẩu đã được mã hóa vào CSDL và xóa đường dẫn xác thực
+    user.password = hashedPassword;
+    user.verifytoken = accessTokenSecret;
+    await user.save();
 
     return res.status(200).json({ message: "Password has been reset successfully!" });
   } catch (error) {
@@ -240,10 +243,25 @@ const schemaProduct = mongoose.Schema({
   image: { type: String, required: true },
   price: { type: String, required: true },
   description: String,
+  comments: [{
+    user: {
+      type: String,
+      required: true
+    },
+    content: {
+      type: String,
+      required: true
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now()
+    }
+  }]
 })
 
 // Tạo một mô hình sản phẩm với lược đồ đã xác định
 const productModel = mongoose.model("product", schemaProduct)
+module.exports = productModel
 
 // Lưu product trong db
 app.post("/uploadProduct", async (req, res) => {
@@ -300,128 +318,76 @@ app.delete("/product/:id", async (req, res) => {
   res.send(data)
 })
 
-// const schemaCart = new mongoose.Schema(
-//   {
-//     userId: {
-//       type: mongoose.Schema.Types.ObjectId,
-//       ref: "user",
-//       required: true,
-//     },
-//     cartItems: [
-//       {
-//         productId: {
-//           type: mongoose.Schema.Types.ObjectId,
-//           ref: "product",
-//           required: true,
-//         },
-//         quantity: { type: Number, default: 1 },
-//       },
-//     ],
-//     createdAt: { type: Date, default: Date.now() },
-//   },
-//   { timestamps: true }
-// );
-
-// const cartModel = mongoose.model("cart", schemaCart);
-
-// // Thêm sản phẩm vào giỏ hàng
-// app.post("/cart/add-cart", async (req, res) => {
-//   // Thêm sản phẩm vào giỏ hàng
-//   const { userId, productId } = req.body;
-
-//   // Tìm giỏ hàng đã có
-//   let cart = await cartModel.findOne({ userId });
-
-//   // Nếu không có, tạo mới giỏ hàng
-//   if (!cart) {
-//     cart = new Cart({ userId, cartItems: [{ product: productId }] });
-//   } else {
-//     // Nếu có rồi, thêm sản phẩm vào giỏ hàng
-//     const index = cart.cartItems.findIndex(
-//       (item) => item.productId.toString() === productId
-//     )
-//     if (index !== -1) {
-//       // Nếu sản phẩm đã có trong giỏ hàng, chỉ cần tăng số lượng lên 1
-//       cart.cartItems[index].quantity += 1;
-//     } else {
-//       // Nếu sản phẩm chưa có, thêm mới vào danh sách
-//       cart.cartItems.push({ product: productId })
-//     }
-//   }
-
-//   // Lưu giỏ hàng và trả về kết quả
-//   await cart.save()
-//   res.json(cart)
-// })
-
-// app.post("/cart/remove-item-cart", async (req, res) => {
-//   const { userId, productId } = req.body;
-
-//   // Tìm giỏ hàng
-//   const cart = await cartModel.findOne({ userId });
-//   if (!cart) {
-//     return res.json({ success: false, message: "Cart not found" });
-//   }
-
-//   // Xóa sản phẩm khỏi danh sách
-//   cart.cartItems = cart.cartItems.filter(
-//     (item) => item.productId.toString() !== productId
-//   );
-
-//   // Lưu giỏ hàng và trả về kết quả
-//   await cart.save();
-//   res.json(cart);
-// })
-
-const purchaseSchema = new mongoose.Schema({
-  // Define the properties of a purchase object
-  fullname: String,
-  email: String,
-  address: String,
-  phone: String,
-  deliveryDate: Date,
-  notice: String,
-  paymentMethod: String,
-  products: [{
-    name: String,
-    category: String,
-    quantity: Number,
-    total: Number
-  }]
-});
-
-const purchaseModel = mongoose.model('Purchase', purchaseSchema);
-module.exports = purchaseModel
-
-app.post('/purchase', async (req, res) => {
+// API endpoint: Lấy tất cả các comment trong database
+app.get('/comments', async (req, res) => {
   try {
-    // Get the user ID from the logged-in user's session or JWT token
-    const userId = req.session.userId;
-
-    // Create a new purchase object from the received data
-    const newPurchase = new Purchase({
-      fullname: req.body.fullname,
-      email: req.body.email,
-      address: req.body.address,
-      phone: req.body.phone,
-      deliveryDate: req.body.delivery,
-      notice: req.body.message,
-      paymentMethod: req.body.paymentMethod,
-      products: req.body.products
-    });
-
-    // Find the user by ID and add the new purchase to their purchases array
-    const user = await userModel.findById(userId);
-    user.purchases.push(newPurchase);
-    await user.save();
-
-    // Send a response back to the frontend indicating success
-    res.json({ message: 'Purchase saved successfully' });
+    const comments = await commentModel.find()
+    res.json(comments)
   } catch (error) {
-    // Handle errors and send a response back to the frontend indicating failure
-    res.status(500).json({ error: 'Failed to save purchase' });
+    res.status(500).json({ message: error.message })
+  }
+})
+
+// const authenticateToken = (req, res, next) => {
+//   const authHeader = req.headers['authorization']
+//   const token = authHeader && authHeader.split(' ')[1]
+
+//   if (token == null) {
+//     req.$user = null;
+//     return next()
+//   }
+
+//   jwt.verify(token, accessTokenSecret, (err, user) => {
+//     if (err) {
+//       req.$user = null;
+//       return next();
+//     }
+
+//     console.log(`User ${user.email} is authenticated.`)
+
+//     localStorage.setItem()
+
+//     // Save user information to context of the request
+//     req.$user = user
+//     next()
+//   })
+// }
+
+app.post('/products/:id/comments', async (req, res) => {
+  try {
+    const productId = req.params.id;
+    const { content } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(productId)) {
+      throw new Error('Invalid product ID')
+    }
+
+    const product = await productModel.findById(productId);
+
+    if (!product) {
+      throw new Error('Product not found');
+    }
+
+    let user;
+    if (req.user && req.user.email) {
+      user = req.user.email;
+    } else {
+      user = 'Anonymous';
+    }
+
+    const comment = { user, content };
+    
+    product.comments.push(comment);
+    await product.save();
+
+    res.status(201).json({ message: 'Comment created' });
+    console.log(product)
+  } catch (error) {
+    console.log(error)
+    res.status(400).json({ message: error.message })
   }
 });
+
 
 // Khởi động máy chủ
 app.listen(PORT, () => {
