@@ -18,7 +18,11 @@ import UpdateProduct from './pages/UpdateProduct'
 import ForgetPassword from './pages/ForgetPassword'
 import ResetPassword from './pages/ResetPassword'
 import Payment from './pages/Payment'
+
 import Information from './pages/Information'
+
+
+import Momo from './pages/Momo'
 
 import ListUser from './pages/ListUser'
 import ChartProduct from './pages/ChartProduct'
@@ -41,7 +45,7 @@ const router = createBrowserRouter(
       <Route path='forgetpassword' element={<ForgetPassword />} />
       <Route path='resetpassword/:token' element={<ResetPassword />} />
       <Route path='payment' element={<Payment />} />
-
+      <Route path='momo' element={<Momo />} />
       <Route path='listuser' element={<ListUser />} />
       <Route path='chartproduct' element={<ChartProduct />} />
       <Route path='invoice' element={<Invoice />} />

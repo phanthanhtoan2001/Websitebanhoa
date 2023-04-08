@@ -14,6 +14,12 @@ const Payment = () => {
         0
     ).toLocaleString('vi', { style: 'decimal', minimumFractionDigits: 0 })
 
+    const totalPrices = productCartItem.reduce(
+        (acc, curr) => acc + parseFloat(curr.total.replace(/\./g, '')),
+        0
+    )
+
+
     const totalQuantity = productCartItem.reduce((acc, curr) => acc + parseInt(curr.quanity), 0)
 
     const userEmail = useSelector(state => state.user.email)
@@ -73,9 +79,10 @@ const Payment = () => {
 
     function handlePaymentMethodChange(event) {
         const { name, value } = event.target
-        if (event.target.value === 'creditcard') {
+        //toast(event.target.value, { style: { background: 'red', color: 'white' } })
+        if (event.target.value === 'creditcard') { 
             setShowBankAccountInfo(true)
-            setShowMomoAccountInfo(false)
+            setShowMomoAccountInfo(false)         
             setData((preve) => {
                 return {
                   ...preve,
@@ -85,6 +92,7 @@ const Payment = () => {
         } else if (event.target.value === 'momo') {
             setShowBankAccountInfo(false)
             setShowMomoAccountInfo(true)
+            
             setData((preve) => {
                 return {
                   ...preve,
@@ -112,19 +120,40 @@ const Payment = () => {
       }
 
     const handleSubmit = async (e) => {
+        if(data.paymentMethod === "momo"){
+            async function fetchData() {
+                const response = await fetch(`${process.env.REACT_APP_SERVER_DOMAIN}/momo?totalmoney=${totalPrices}`)
 
-        
-          toast("work perfect", { style: { background: 'red', color: 'white' } })
-          const response = await fetch(`${process.env.REACT_APP_SERVER_DOMAIN}/checkout`, {
-            method: "POST",
-            headers: { "content-type": "application/json" },
-            body: JSON.stringify(data) // Chuyển đổi data thành chuỗi và gửi lên server
-          })
-          const dataRes = await response.json()
+                const json = await response.json()
+                console.log(json)
+                const responses = await fetch(`${process.env.REACT_APP_SERVER_DOMAIN}/checkout`, {
+                    method: "POST",
+                    headers: { "content-type": "application/json" },
+                    body: JSON.stringify(data) // Chuyển đổi data thành chuỗi và gửi lên server
+                  }) 
+                  const dataRes = await responses.json()
+
+                window.location.replace(json);
+
+              }
+              fetchData();
+        }
+        else{
+            const response = await fetch(`${process.env.REACT_APP_SERVER_DOMAIN}/checkout`, {
+                method: "POST",
+                headers: { "content-type": "application/json" },
+                body: JSON.stringify(data) // Chuyển đổi data thành chuỗi và gửi lên server
+              }) 
+              const dataRes = await response.json()
           console.log(dataRes)
           if (dataRes.alert) { // Nếu đăng ký thành công thì redirect sang trang đăng nhập
             navigate("/")
+            toast("thanh toán thành công", { style: { background: 'red', color: 'white' } })
           }
+        }
+    
+
+          
 
 
     }

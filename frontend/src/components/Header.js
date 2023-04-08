@@ -21,6 +21,7 @@ const Header = () => {
   const handleLogout = () => {
     dispatch(logoutRedux())  // Đăng xuất user, gọi function logoutRedux từ trong rootReducer sử dụng useSelector và useDispatch hooks đã import
     toast("Logout successfully")
+    window.location.reload()
   }
 
   const cartItemNumber = useSelector((state) => state.product.cartItem)

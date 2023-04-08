@@ -9,7 +9,7 @@ async function paymentmomo(amount) {
     var requestId = partnerCode + new Date().getTime();
     var orderId = requestId;
     var orderInfo = "pay with MoMo";
-    var redirectUrl = "https://youtube.com";
+    var redirectUrl = "http://localhost:3000/";
     var ipnUrl = redirectUrl;
     // var ipnUrl = redirectUrl = "https://webhook.site/454e7b77-f177-4ece-8236-ddf1c26ba7f8";
     var amount = amount;

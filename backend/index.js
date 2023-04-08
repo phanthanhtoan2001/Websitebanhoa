@@ -227,42 +227,31 @@ app.post('/send-otp', async (req, res) => {
 // POST yêu cầu xác thực OTP và reset mật khẩu
 app.post('/verify-otp', async (req, res) => {
   try {
-    image.pngimage.png
+    const { token, otp, newPassword } = req.body; // Extract 'token', 'otp', and 'newPassword' from request body
 
-    // Xác minh mã thông báo OTP bằng mã OTP đầu vào
-    const decodedToken = jwt.verify(token, accessTokenSecret)
+    // Verify OTP token
+    const decodedToken = jwt.verify(token, accessTokenSecret);
     if (!decodedToken || decodedToken.otp !== otp) {
-      return res.status(400).json({ message: "Invalid OTP code!" })
+      return res.status(400).json({ message: "Invalid OTP code!" });
     }
 
-    // Cập nhật mật khẩu của người dùng và xóa mã thông báo xác minh
-    const user = await userModel.findOne({ verifytoken: token })
+    // Update user password and delete verification token
+    const user = await userModel.findOne({ verifytoken: token });
     if (!user) {
-      return res.status(404).json({ message: "User not found!" })
+      return res.status(404).json({ message: "User not found!" });
     }
 
-    // Hash mật khẩu mới
-    const hashedPassword = await bcrypt.hash(newPassword, 10)
-
-    // Cập nhật mật khẩu đã được mã hóa vào CSDL và xóa đường dẫn xác thực
-    user.password = hashedPassword
-    user.verifytoken = accessTokenSecret
-    await user.save()
-
-
-    // Đặt mật khẩu mới và xóa mã thông báo xác minh
-    user.password = newPassword;
-    user.verifytoken = '';
+    const hashedPassword = await bcrypt.hash(newPassword, 10); // hash new password
+    user.password = hashedPassword;
+    user.verifytoken = null; // remove verification token
     await user.save();
 
-
     return res.status(200).json({ message: "Password has been reset successfully!" });
-
   } catch (error) {
-    console.log(error)
-    return res.status(500).json({ message: "OTP verification failed!" })
+    console.log(error);
+    return res.status(500).json({ message: "OTP verification failed!" });
   }
-})
+});
 
 // Xác định lược đồ sản phẩm cho mongoose
 const schemaProduct = mongoose.Schema({
@@ -565,7 +554,7 @@ const createbill = function (userid, total, date, note, method, address) {
 
 app.post('/checkout', async (req, res) => {
 
-
+// console.log(req.body);
   const { productCartItem, userid, totalPrice, Note, paymentMethod, address } = req.body
   try {
     var today = new Date()
@@ -582,13 +571,11 @@ app.post('/checkout', async (req, res) => {
 
 
         let idbill = bill._id
-        console.log("> Created new billid\n", idbill);
         productCartItem.map(async e => {
           let productid = e._id
           let quantity = e.quanity
           createbilldetail(productid, idbill, quantity)
             .then(billdetail => {
-              console.log("> Created new Customer\n", billdetail);
             })
         })
       })
@@ -603,9 +590,12 @@ app.post('/checkout', async (req, res) => {
 //momo payment
 app.get("/momo", async (req, res) => {
   try {
-    const url = await paymentmomo(2000)// amount
 
-    res.send(JSON.stringify(url));
+    var money = req.url.split('=')[1];
+    
+      const url = await paymentmomo(money)// ammo
+      res.send(JSON.stringify(url));
+
   } catch (err) {
     console.error(err); // log any errors to the console
     res.status(500).send('Internal Server Error'); // return an error message to the client
