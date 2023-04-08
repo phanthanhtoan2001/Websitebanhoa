@@ -394,7 +394,60 @@ app.get("/listuser", async (req, res) => {
   const data = await userModel.find({})
   res.send(data)
 })
+app.get("/chartproduct", async (req, res) => {
+  const topProducts = await billdetailModel.aggregate([
+    {
+      $group: {
+        _id: "$productid",
+        totalQuantity: { $sum: "$quantity" }
+      }
+    },
+    {
+      $lookup: {
+        from: "products",
+        localField: "_id",
+        foreignField: "_id",
+        as: "product"
+      }
+    },
+    {
+      $project: {
+        name: { $arrayElemAt: ["$product.name", 0] },
+        totalQuantity: 1
+      }
+    },
+    {
+      $sort: {
+        totalQuantity: -1 // Sort in descending order
+      }
+    },
+    {
+      $limit: 5 // Select top 5
+    }
+  ]);
+  const allBills = await billModel.aggregate([
+    {
+      $lookup: {
+        from: "users",
+        localField: "userid",
+        foreignField: "_id",
+        as: "user"
+      },
+    },
+    {
+      $sort: {
+        date: -1 
+      }
+    }
+  ]);
+  const data = {
+    topProducts: topProducts,
+    allBills: allBills
+  };
+  res.send(JSON.stringify(data));
 
+})
+// END ADMIN
 
 const billdetailSchema = mongoose.Schema({
   productid: mongoose.Schema.Types.ObjectId,
@@ -482,12 +535,12 @@ app.post('/checkout', async (req, res) => {
 //momo payment
 app.get("/momo", async (req, res) => {
   try {
-      const url = await paymentmomo(2000)// ammo
-      
-      res.send(url);
+    const url = await paymentmomo(2000)// amount
+
+    res.send(JSON.stringify(url));
   } catch (err) {
-      console.error(err); // log any errors to the console
-      res.status(500).send('Internal Server Error'); // return an error message to the client
+    console.error(err); // log any errors to the console
+    res.status(500).send('Internal Server Error'); // return an error message to the client
   }
 });
 // Khởi động máy chủ
