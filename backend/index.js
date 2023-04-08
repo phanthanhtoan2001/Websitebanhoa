@@ -5,12 +5,14 @@ const dotenv = require("dotenv")
 const nodemailer = require("nodemailer")
 const jwt = require("jsonwebtoken")
 const bcrypt = require('bcrypt')
+const paymentmomo = require("./momopayment")
+
 
 const accessTokenSecret = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
 
 const app = express() // Tạo instance của Express app
 app.use(cors())
-app.use(express.json({ limit: "10mb" })) // Phân tích cú pháp dữ liệu JSON trong các yêu cầu có kích thước tối đa là 10 MB
+app.use(express.json({ limit: "100mb" })) // Phân tích cú pháp dữ liệu JSON trong các yêu cầu có kích thước tối đa là 10 MB
 
 dotenv.config() // Nạp các biến môi trường vào đối tượng process.env  
 
@@ -40,6 +42,7 @@ const userSchema = mongoose.Schema({
 const userModel = new mongoose.model("user", userSchema) // Tạo model instance cho User schema để tương tác với MongoDB
 module.exports = userModel // Xuất UserModel để sử dụng ở nơi khác trong ứng dụng
 
+
 app.get("/", (req, res) => {
   res.send("Server is running")  // Gửi phản hồi bằng văn bản
 })
@@ -50,27 +53,16 @@ app.get("/signup", (req, res) => {
 })
 
 app.post('/signup', async (req, res) => {
-  const { email, password } = req.body
+  const { email } = req.body
   try {
     const result = await userModel.findOne({ email: email })
     if (result) {
-      res.status(400).json({
-        message: 'Email already registered',
-        alert: false
-      })
+      res.status(400).json({ message: 'Email already registered', alert: false })
     } else {
-      const hashedPassword = await bcrypt.hash(password, 10) // Hash password using bcrypt
-      const newUser = new userModel({
-        firstName: req.body.firstName,
-        lastName: req.body.lastName,
-        email: email,
-        password: hashedPassword,
-        image: req.body.image,
-        verifytoken: req.body.verifytoken
-      })
+      const newUser = new userModel(req.body)
       await newUser.save()
       res.status(200).json({
-        message: 'You have successfully registered',
+        message: 'User data has been successfully stored',
         alert: true,
       })
     }
@@ -78,10 +70,11 @@ app.post('/signup', async (req, res) => {
     console.log(err)
     res.status(500).json({
       message: 'Error occurred while saving user data',
-      alert: false
+      alert: false,
     })
   }
 })
+
 
 // Login page
 app.get("/login", (req, res) => {
@@ -89,13 +82,14 @@ app.get("/login", (req, res) => {
 })
 
 app.post('/login', async (req, res) => {
-  console.log(req.body)
   const { email, password } = req.body
 
   try {
     const result = await userModel.findOne({ email: email })
 
-    if (result && await bcrypt.compare(password, result.password)) { // Compare input password with hash from database
+    if (result && await bcrypt.compare(password, result.password)) { // So sánh mật khẩu đầu vào với hàm băm từ cơ sở dữ liệu
+      const token = jwt.sign({ email: result.email }, accessTokenSecret) // Xuất JWT với payload là email
+
       const dataSend = {
         _id: result._id,
         firstName: result.firstName,
@@ -108,6 +102,7 @@ app.post('/login', async (req, res) => {
         message: 'Login is successful',
         alert: true,
         data: dataSend,
+        token: token, // Gửi JWT về phía client
         background: '#00FF7F',
         color: 'white'
       })
@@ -131,38 +126,66 @@ app.post('/login', async (req, res) => {
   }
 })
 
+app.put('/users/:userId', async (req, res) => {
+  const { userId } = req.params
+  const { email, firstName, lastName, image } = req.body
+
+  try {
+    const user = await userModel.findByIdAndUpdate(
+      userId,
+      {
+        $set: {
+          email: email,
+          firstName: firstName,
+          lastName: lastName,
+          image: image
+        }
+      },
+      { new: true }
+    )
+    if (!user) {
+      return res.status(404).json({ message: "User not found." })
+    }
+
+    return res.json(user)
+  } catch (error) {
+    console.error(error)
+    return res.status(500).json({ message: "Internal server error." })
+  }
+})
+
 // Lấy thông tin tài khoản người dùng
 app.get("/users/:userId", async (req, res) => {
-  const { userId } = req.params;
+  const { userId } = req.params
   try {
-    const user = await userModel.findById(userId);
+    const user = await userModel.findById(userId)
     if (!user) {
-      return res.status(404).json({ message: "User not found." });
+      return res.status(404).json({ message: "User not found." })
     }
-    return res.json(user);
+    return res.json(user)
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Internal server error." });
+    console.error(error)
+    return res.status(500).json({ message: "Internal server error." })
   }
-});
+})
 
 // POST yêu cầu gửi OTP đến email người dùng
 app.post('/send-otp', async (req, res) => {
   try {
-    const userEmail = req.body.email;
+    const userEmail = req.body.email
 
     // Tìm thông tin người dùng dựa trên email trong database.
-    const user = await userModel.findOne({ email: userEmail });
+    const user = await userModel.findOne({ email: userEmail })
     if (!user) {
-      return res.status(404).json({ message: "User not found!" });
+      return res.status(404).json({ message: "User not found!" })
     }
 
     // Tạo mã OTP ngẫu nhiên và băm nó sử dụng jwt
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const token = jwt.sign({ otp }, accessTokenSecret, { expiresIn: '10m' });
+    const otp = Math.floor(100000 + Math.random() * 900000).toString()
+    const token = jwt.sign({ otp }, accessTokenSecret, { expiresIn: '10m' })
 
     // Cập nhật mã xác minh của người dùng với mã OTP mới trong database
-    await userModel.findByIdAndUpdate(user._id, { $set: { verifytoken: token } });
+    await userModel.findByIdAndUpdate(user._id, { $set: { verifytoken: token } })
 
     // Cấu hình nodemailer
     let transporter = nodemailer.createTransport({
@@ -176,7 +199,7 @@ app.post('/send-otp', async (req, res) => {
       tls: {
         ciphers: 'SSLv3'
       }
-    });
+    })
 
     // Gửi email với mã OTP và chuyển hướng người dùng đến trang nhập OTP
     let mailOptions = {
@@ -184,47 +207,44 @@ app.post('/send-otp', async (req, res) => {
       to: userEmail,
       subject: 'Your OTP Code',
       html: `<p>Your OTP code is: <b>${otp}</b></p><p>Please use this code within 10 minutes to reset your password.</p><a href="http://localhost:3000/resetpassword/${token}">Enter OTP code ></a>`
-    };
+    }
 
     transporter.sendMail(mailOptions, function (error, info) {
       if (error) {
-        console.log(error);
-        return res.status(500).json({ message: "Failed to send OTP!" });
+        console.log(error)
+        return res.status(500).json({ message: "Failed to send OTP!" })
       } else {
-        console.log('Email sent: ' + info.response);
-        return res.status(200).json({ message: "OTP has been sent to your email!" });
+        console.log('Email sent: ' + info.response)
+        return res.status(200).json({ message: "OTP has been sent to your email!" })
       }
-    });
+    })
   } catch (error) {
-    console.log(error);
-    return res.status(500).json({ message: "Failed to send OTP!" });
+    console.log(error)
+    return res.status(500).json({ message: "Failed to send OTP!" })
   }
-});
+})
 
 // POST yêu cầu xác thực OTP và reset mật khẩu
 app.post('/verify-otp', async (req, res) => {
   try {
-    const { token, otp, newPassword } = req.body;
+    const { token, otp, newPassword } = req.body; // Extract 'token', 'otp', and 'newPassword' from request body
 
-    // Xác minh mã thông báo OTP bằng mã OTP đầu vào
+    // Verify OTP token
     const decodedToken = jwt.verify(token, accessTokenSecret);
     if (!decodedToken || decodedToken.otp !== otp) {
       return res.status(400).json({ message: "Invalid OTP code!" });
     }
 
-    // Cập nhật mật khẩu của người dùng và xóa mã thông báo xác minh
+    // Update user password and delete verification token
     const user = await userModel.findOne({ verifytoken: token });
     if (!user) {
       return res.status(404).json({ message: "User not found!" });
     }
 
-     // Hash mật khẩu mới
-     const hashedPassword = await bcrypt.hash(newPassword, 10); 
-
-     // Cập nhật mật khẩu đã được mã hóa vào CSDL và xóa đường dẫn xác thực
-     user.password = hashedPassword;
-     user.verifytoken = accessTokenSecret;
-     await user.save();
+    const hashedPassword = await bcrypt.hash(newPassword, 10); // hash new password
+    user.password = hashedPassword;
+    user.verifytoken = null; // remove verification token
+    await user.save();
 
     return res.status(200).json({ message: "Password has been reset successfully!" });
   } catch (error) {
@@ -240,10 +260,27 @@ const schemaProduct = mongoose.Schema({
   image: { type: String, required: true },
   price: { type: String, required: true },
   description: String,
+  comments: [{
+    user: {
+      type: String,
+      required: true
+    },
+    content: {
+      type: String,
+      required: true
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now()
+    }
+  }]
 })
 
 // Tạo một mô hình sản phẩm với lược đồ đã xác định
 const productModel = mongoose.model("product", schemaProduct)
+
+module.exports = productModel
+
 
 // Lưu product trong db
 app.post("/uploadProduct", async (req, res) => {
@@ -271,6 +308,7 @@ app.post("/uploadProduct", async (req, res) => {
 })
 
 // Product page
+//  Product page
 app.get("/product", async (req, res) => {
   const data = await productModel.find({})
   res.send(data)
@@ -300,130 +338,272 @@ app.delete("/product/:id", async (req, res) => {
   res.send(data)
 })
 
-// const schemaCart = new mongoose.Schema(
-//   {
-//     userId: {
-//       type: mongoose.Schema.Types.ObjectId,
-//       ref: "user",
-//       required: true,
-//     },
-//     cartItems: [
-//       {
-//         productId: {
-//           type: mongoose.Schema.Types.ObjectId,
-//           ref: "product",
-//           required: true,
-//         },
-//         quantity: { type: Number, default: 1 },
-//       },
-//     ],
-//     createdAt: { type: Date, default: Date.now() },
-//   },
-//   { timestamps: true }
-// );
-
-// const cartModel = mongoose.model("cart", schemaCart);
-
-// // Thêm sản phẩm vào giỏ hàng
-// app.post("/cart/add-cart", async (req, res) => {
-//   // Thêm sản phẩm vào giỏ hàng
-//   const { userId, productId } = req.body;
-
-//   // Tìm giỏ hàng đã có
-//   let cart = await cartModel.findOne({ userId });
-
-//   // Nếu không có, tạo mới giỏ hàng
-//   if (!cart) {
-//     cart = new Cart({ userId, cartItems: [{ product: productId }] });
-//   } else {
-//     // Nếu có rồi, thêm sản phẩm vào giỏ hàng
-//     const index = cart.cartItems.findIndex(
-//       (item) => item.productId.toString() === productId
-//     )
-//     if (index !== -1) {
-//       // Nếu sản phẩm đã có trong giỏ hàng, chỉ cần tăng số lượng lên 1
-//       cart.cartItems[index].quantity += 1;
-//     } else {
-//       // Nếu sản phẩm chưa có, thêm mới vào danh sách
-//       cart.cartItems.push({ product: productId })
-//     }
-//   }
-
-//   // Lưu giỏ hàng và trả về kết quả
-//   await cart.save()
-//   res.json(cart)
-// })
-
-// app.post("/cart/remove-item-cart", async (req, res) => {
-//   const { userId, productId } = req.body;
-
-//   // Tìm giỏ hàng
-//   const cart = await cartModel.findOne({ userId });
-//   if (!cart) {
-//     return res.json({ success: false, message: "Cart not found" });
-//   }
-
-//   // Xóa sản phẩm khỏi danh sách
-//   cart.cartItems = cart.cartItems.filter(
-//     (item) => item.productId.toString() !== productId
-//   );
-
-//   // Lưu giỏ hàng và trả về kết quả
-//   await cart.save();
-//   res.json(cart);
-// })
-
-const purchaseSchema = new mongoose.Schema({
-  // Define the properties of a purchase object
-  fullname: String,
-  email: String,
-  address: String,
-  phone: String,
-  deliveryDate: Date,
-  notice: String,
-  paymentMethod: String,
-  products: [{
-    name: String,
-    category: String,
-    quantity: Number,
-    total: Number
-  }]
-});
-
-const purchaseModel = mongoose.model('Purchase', purchaseSchema);
-module.exports = purchaseModel
-
-app.post('/purchase', async (req, res) => {
+// API endpoint: Lấy tất cả các comment trong database
+app.get('/comments', async (req, res) => {
   try {
-    // Get the user ID from the logged-in user's session or JWT token
-    const userId = req.session.userId;
-
-    // Create a new purchase object from the received data
-    const newPurchase = new Purchase({
-      fullname: req.body.fullname,
-      email: req.body.email,
-      address: req.body.address,
-      phone: req.body.phone,
-      deliveryDate: req.body.delivery,
-      notice: req.body.message,
-      paymentMethod: req.body.paymentMethod,
-      products: req.body.products
-    });
-
-    // Find the user by ID and add the new purchase to their purchases array
-    const user = await userModel.findById(userId);
-    user.purchases.push(newPurchase);
-    await user.save();
-
-    // Send a response back to the frontend indicating success
-    res.json({ message: 'Purchase saved successfully' });
+    const comments = await commentModel.find()
+    res.json(comments)
   } catch (error) {
-    // Handle errors and send a response back to the frontend indicating failure
-    res.status(500).json({ error: 'Failed to save purchase' });
+    res.status(500).json({ message: error.message })
+  }
+})
+
+app.post('/products/:id/comments', async (req, res) => {
+  try {
+    const productId = req.params.id
+    const { user, content } = req.body
+
+    if (!mongoose.Types.ObjectId.isValid(productId)) {
+      throw new Error('Invalid product ID')
+    }
+
+    const product = await productModel.findById(productId)
+    if (!product) {
+      throw new Error('Product not found')
+    }
+
+    const comment = { user, content }
+    product.comments.push(comment)
+    await product.save()
+
+
+    res.status(201).json({ message: 'Comment created' })
+
+  } catch (error) {
+    console.log(error)
+    res.status(400).json({ message: error.message })
+  }
+
+});
+//Admin - user 
+app.get("/listuser", async (req, res) => {
+  const data = await userModel.find({})
+  res.send(data)
+})
+app.get("/chartproduct", async (req, res) => {
+  const topProducts = await billdetailModel.aggregate([
+    {
+      $group: {
+        _id: "$productid",
+        totalQuantity: { $sum: "$quantity" }
+      }
+    },
+    {
+      $lookup: {
+        from: "products",
+        localField: "_id",
+        foreignField: "_id",
+        as: "product"
+      }
+    },
+    {
+      $project: {
+        name: { $arrayElemAt: ["$product.name", 0] },
+        totalQuantity: 1
+      }
+    },
+    {
+      $sort: {
+        totalQuantity: -1 // Sort in descending order
+      }
+    },
+    {
+      $limit: 5 // Select top 5
+    }
+  ]);
+  const allBills = await billModel.aggregate([
+    {
+      $lookup: {
+        from: "users",
+        localField: "userid",
+        foreignField: "_id",
+        as: "user"
+      },
+    },
+    {
+      $sort: {
+        date: -1
+      }
+    }
+  ]);
+  const data = {
+    topProducts: topProducts,
+    allBills: allBills
+  };
+  res.send(JSON.stringify(data));
+
+})
+app.get("/invoicebill", async (req, res) => {
+
+  const result = await billdetailModel.aggregate([
+    {
+      // Bước 1: Tìm kiếm thông tin chi tiết hóa đơn với mã hóa đơn là 'HD001'
+      $match: { billid: new mongoose.Types.ObjectId(req.query.idbill) }
+    },
+    {
+      // Bước 2: Join với bảng sản phẩm để lấy thông tin sản phẩm
+      $lookup: {
+        from: 'products', // Tên bảng sản phẩm
+        localField: 'productid', // Trường liên kết trong bảng chi tiết hóa đơn
+        foreignField: '_id', // Trường liên kết trong bảng sản phẩm
+        as: 'product' // Tên trường chứa thông tin sản phẩm sau khi join
+      }
+    },
+    {
+      // Bước 3: Join với bảng người dùng để lấy thông tin người dùng
+      $lookup: {
+        from: 'users', // Tên bảng người dùng
+        localField: 'userid', // Trường liên kết trong bảng chi tiết hóa đơn
+        foreignField: '_id', // Trường liên kết trong bảng người dùng
+        as: 'user' // Tên trường chứa thông tin người dùng sau khi join
+      }
+    },
+    {
+      // Bước 3: Join với bảng người dùng để lấy thông tin người dùng
+      $lookup: {
+        from: 'bills', // Tên bảng người dùng
+        localField: 'billid', // Trường liên kết trong bảng chi tiết hóa đơn
+        foreignField: '_id', // Trường liên kết trong bảng người dùng
+        as: 'bill' // Tên trường chứa thông tin người dùng sau khi join
+      }
+    },
+    {
+      // Bước 4: Định dạng lại kết quả trả về
+      $project: {
+        _id: 0,
+        billdetail_id: '$_id',
+        quantity: '$quantity',
+        product: { $arrayElemAt: ['$product', 0] },
+        user: { $arrayElemAt: ['$user', 0] },
+        bill: { $arrayElemAt: ['$bill', 0] }
+      }
+    }
+  ]);
+
+  //console.log(req.query.idbill)
+  res.send(result)
+
+})
+// END ADMIN
+
+const billdetailSchema = mongoose.Schema({
+  productid: mongoose.Schema.Types.ObjectId,
+  billid: mongoose.Schema.Types.ObjectId,
+  quantity: Number
+})
+
+const billdetailModel = new mongoose.model("Billdetail", billdetailSchema) // Tạo model instance cho User schema để tương tác với MongoDB
+module.exports = billdetailModel // Xuất billdetail để sử dụng ở nơi khác trong ứng dụng
+
+
+app.get('/products/:id/comments', async (req, res) => {
+  try {
+    const productId = req.params.id
+
+    if (!mongoose.Types.ObjectId.isValid(productId)) {
+      throw new Error('Invalid product ID')
+    }
+
+    const product = await productModel.findById(productId)
+    if (!product) {
+      throw new Error('Product not found')
+    }
+
+    res.status(200).json({ comments: product.comments })
+  } catch (error) {
+    console.log(error)
+    res.status(400).json({ message: error.message })
+  }
+})
+
+const createbilldetail = function (productid, billid, quantity) {
+  const billdetail = new billdetailModel({
+    productid,
+    billid,
+    quantity
+  });
+
+  return billdetail.save();
+};
+
+const billSchema = mongoose.Schema({
+  userid: mongoose.Schema.Types.ObjectId,
+  total: String,
+  date: String,
+  note: String,
+  method: String,
+  address: String,
+})
+
+const billModel = new mongoose.model("Bill", billSchema) // Tạo model instance cho User schema để tương tác với MongoDB
+module.exports = billModel // Xuất billdetail để sử dụng ở nơi khác trong ứng dụng
+
+
+const createbill = function (userid, total, date, note, method, address) {
+  const billdetail = new billModel({
+    userid,
+    total,
+    date,
+    note,
+    method,
+    address
+  });
+
+  return billdetail.save();
+};
+
+app.post('/checkout', async (req, res) => {
+
+// console.log(req.body);
+  const { productCartItem, userid, totalPrice, Note, paymentMethod, address } = req.body
+  try {
+    var today = new Date()
+    if (today.getMonth() + 1 < 10)
+      var month = '0' + (today.getMonth() + 1)
+    else var month = today.getMonth()
+    if (today.getDate() < 10)
+      var dates = '0' + today.getDate()
+
+    else var dates = today.getDate()
+    date = today.getFullYear() + '/' + month + '/' + dates;
+    await createbill(userid, totalPrice, date, Note, paymentMethod, address)
+      .then(bill => {
+
+
+        let idbill = bill._id
+        productCartItem.map(async e => {
+          let productid = e._id
+          let quantity = e.quanity
+          createbilldetail(productid, idbill, quantity)
+            .then(billdetail => {
+            })
+        })
+      })
+    res.status(200).json({
+      message: 'bill create has been successfully stored',
+      alert: true,
+    })
+  }
+  catch (err) { console.log(err) }
+
+})
+//momo payment
+app.get("/momo", async (req, res) => {
+  try {
+
+    var money = req.url.split('=')[1];
+    
+      const url = await paymentmomo(money)// ammo
+      res.send(JSON.stringify(url));
+
+  } catch (err) {
+    console.error(err); // log any errors to the console
+    res.status(500).send('Internal Server Error'); // return an error message to the client
   }
 });
-
 // Khởi động máy chủ
 app.listen(PORT, () => {
   console.log(`Webflowwer app is listening at http://localhost:${PORT}`)
 })
+
+

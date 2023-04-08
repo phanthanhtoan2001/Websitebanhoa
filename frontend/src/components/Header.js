@@ -21,6 +21,7 @@ const Header = () => {
   const handleLogout = () => {
     dispatch(logoutRedux())  // Đăng xuất user, gọi function logoutRedux từ trong rootReducer sử dụng useSelector và useDispatch hooks đã import
     toast("Logout successfully")
+    window.location.reload()
   }
 
   const cartItemNumber = useSelector((state) => state.product.cartItem)
@@ -37,7 +38,7 @@ const Header = () => {
           <Link to={'/'} className='mx-4 text-gray-600 hover:text-red-500 my-2 md:my-0' style={{ fontSize: '1.6rem' }}>
             Home
           </Link>
-          <Link to={'/menu/64044b0f441f315547c69a7c'} className='mx-4 text-gray-600 hover:text-red-500 my-2 md:my-0' style={{ fontSize: '1.6rem' }}>
+          <Link to={'/menu/64044e081d57ce8320c49d91'} className='mx-4 text-gray-600 hover:text-red-500 my-2 md:my-0' style={{ fontSize: '1.6rem' }}>
             Menu
           </Link>
           <Link to={'/about'} className='mx-4 text-gray-600 hover:text-red-500 my-2 md:my-0' style={{ fontSize: '1.6rem' }}>
@@ -46,6 +47,15 @@ const Header = () => {
           <Link to={'/contact'} className='mx-4 text-gray-600 hover:text-red-500 my-2 md:my-0' style={{ fontSize: '1.6rem' }}>
             Contact
           </Link>
+
+          {userData.email === process.env.REACT_APP_ADMIN_EMAIL && <Link to={'/listuser'} className='mx-4 text-gray-600 hover:text-red-500 my-2 md:my-0' style={{ fontSize: '1.6rem' }}>
+            List User
+          </Link>}
+          {userData.email === process.env.REACT_APP_ADMIN_EMAIL && <Link to={'/chartproduct'} className='mx-4 text-gray-600 hover:text-red-500 my-2 md:my-0' style={{ fontSize: '1.6rem' }}>
+            Chart Product
+          </Link>}
+
+
           <div className='text-2x1 text-slate-600 relative'>
             <Link to={'/cart'} className='ml-10 mx-4 text-gray-600 hover:text-red-500'>
               <FaShoppingCart size={30} />
@@ -71,11 +81,30 @@ const Header = () => {
                   //Hiện thị link 'New product' cho người dùng với email là email của admin
                   userData.email === process.env.REACT_APP_ADMIN_EMAIL && <Link to={'/newproduct'} className='whitespace-nowrap cursor-pointer text-black'>New product</Link>
                 }
-                {
-                  userData.image ? (<p className='flex items-center justify-center cursor-pointer text-white px-3 bg-red-300' onClick={handleLogout}>
-                    Logout ({userData.firstName})
-                  </p>) : (<Link to={'/login'} className='whitespace-nowrap cursor-pointer text-black'>Login</Link>)
-                }
+
+
+         
+
+                  {
+                    userData.email ? (
+                      <div>
+                        <Link to={`/information/${userData._id}`} className="text-black">
+                          Information
+                        </Link>
+                        <p
+                          className="flex items-center justify-center cursor-pointer text-white px-3 bg-red-300"
+                          onClick={handleLogout}
+                        >
+                          Logout ({userData.firstName})
+                        </p>
+                      </div>
+                    ) : (
+                      <Link to="/login" className="whitespace-nowrap cursor-pointer text-black">
+                        Login
+                      </Link>
+                    )
+                  }
+
               </div>
             )}
           </div>

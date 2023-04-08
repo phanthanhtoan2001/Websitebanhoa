@@ -17,8 +17,6 @@ const Login = () => {
     password: ""
   })
 
-  const userData = useSelector(state => state) //Sử dụng hook `useSelector` để lấy toàn bộ state trong Redux store
-
   const dispacth = useDispatch() //Sử dụng hook `useDispatch` để gửi action đăng nhập lên Redux store
 
   const handleShowPassword = () => { //Hàm để toggle hiển thị/ẩn mật khẩu
@@ -40,8 +38,10 @@ const Login = () => {
     const { email, password } = data
     if (email && password) { //Nếu đầy đủ cả email và password thì gửi request lên server kiểm tra đăng nhập
       try {
-        let userState = JSON.parse(localStorage.getItem(`${process.env.REACT_APP_LOCAL_STORAGE_KEY}/`))
-        if (userState) {  // Kiểm tra nếu có thông tin đăng nhập trong localStorage
+
+        let userState = JSON.parse(sessionStorage.getItem(`${process.env.REACT_APP_LOCAL_STORAGE_KEY}/`))
+        if (userState) {  // Kiểm tra nếu có thông tin đăng nhập trong sessionStorage
+
           dispacth(loginRedux(userState))
           setTimeout(() => {
             navigate("/")

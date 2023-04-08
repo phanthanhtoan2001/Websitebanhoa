@@ -6,6 +6,6 @@ import userSliceReducer from './userSlice'
 export const store = configureStore({
     reducer: {
         user: userSliceReducer, // Đối tượng user
-        product: productSliceReducer // Đối tượng sản phẩm
+        product: productSliceReducer, // Đối tượng sản phẩm
     },
 })

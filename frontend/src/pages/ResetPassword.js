@@ -1,40 +1,46 @@
-import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import loginImage from '../assets/login-user.gif';
+import React, { useState } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
+import loginImage from '../assets/login-user.gif'
+import { BiShow, BiHide } from 'react-icons/bi'
 
 const ResetPassword = () => {
     // Thiết lập trạng thái cho OTP và mật khẩu mới
-    const [otp, setOtp] = useState('');
-    const [newPassword, setNewPassword] = useState('');
+    const [otp, setOtp] = useState('')
+    const [newPassword, setNewPassword] = useState('')
+    const [showPassword, setShowPassword] = useState(false) //state để hiển thị hoặc ẩn mật khẩu khi đăng nhập
 
     // Nhận mã thông báo từ thông số URL và thiết lập điều hướng
-    const { token } = useParams();
-    const navigate = useNavigate();
+    const { token } = useParams()
+    const navigate = useNavigate()
 
     // Cập nhật trạng thái cho OTP và mật khẩu mới khi người dùng nhập vào trường nhập liệu
     const handleOtpChange = (event) => {
-        setOtp(event.target.value);
-    };
+        setOtp(event.target.value)
+    }
 
     const handlePasswordChange = (event) => {
-        setNewPassword(event.target.value);
-    };
+        setNewPassword(event.target.value)
+    }
+
+    const handleShowPassword = () => { //Hàm để toggle hiển thị/ẩn mật khẩu
+        setShowPassword(prev => !prev)
+    }
 
     // Xử lý gửi biểu mẫu khi người dùng gửi biểu mẫu để đặt lại mật khẩu của họ
     const handleSubmit = async (event) => {
-        event.preventDefault();
+        event.preventDefault()
 
         // Kiểm tra xem trường OTP và mật khẩu có trống không
         if (!otp || !newPassword) {
-            alert('Please enter OTP and password!');
-            return;
+            alert('Please enter OTP and password!')
+            return
         }
 
         // Kiểm tra xem mật khẩu có chứa ít nhất một chữ số, một ký tự đặc biệt và dài hơn 6 ký tự không
-        const passwordRegex = /^(?=.*\d)(?=.*[!@#$%^&-*])(?=.*[a-zA-Z]).{6,}$/;
+        const passwordRegex = /^(?=.*\d)(?=.*[!@#$%^&-*+/_])(?=.*[a-zA-Z]).{6,}$/
         if (!passwordRegex.test(newPassword)) {
-            alert('Password must contain at least one digit, one special character, and be longer than 6 characters.');
-            return;
+            alert('Password must contain at least one digit, one special character, and be longer than 6 characters.')
+            return
         }
 
         try {
@@ -45,21 +51,21 @@ const ResetPassword = () => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ token, otp, newPassword }),
-            });
+            })
             // Nếu phản hồi không ổn, ném lỗi
             if (!response.ok) {
-                throw new Error('Failed to reset password');
+                throw new Error('Failed to reset password')
             }
 
             // Nếu phản hồi OK, hiển thị thông báo thành công và điều hướng đến trang đăng nhập
-            const data = await response.json();
-            alert(data.message);
-            navigate('/login');
+            const data = await response.json()
+            alert(data.message)
+            navigate('/login')
         } catch (error) {
-            console.log(error);
-            alert('Failed to reset password!');
+            console.log(error)
+            alert('Failed to reset password!')
         }
-    };
+    }
 
     return (
         <>
@@ -83,13 +89,16 @@ const ResetPassword = () => {
                             />
 
                             <label htmlFor="newpassword">New Password</label>
-                            <input
-                                id="newpassword"
-                                type="password"
-                                className="mt-1 mb-2 w-full bg-slate-200 px-8 py-2 rounded-full focus-within:outline-blue-400"
-                                value={newPassword}
-                                onChange={handlePasswordChange}
-                            />
+                            <div className='flex px-2 py-1 bg-slate-200 mt-1 mb-2 rounded-full outline-none focus-within:outline-blue-400'>
+                                <input
+                                    id="newpassword"
+                                    type={showPassword ? "text" : "password"}
+                                    className="mt-1 mb-2 w-full bg-slate-200 px-8 py-2 rounded-full focus-within:outline-blue-400"
+                                    value={newPassword}
+                                    onChange={handlePasswordChange}
+                                />
+                                <span className='flex text-2xl py-3 cursor-pointer' onClick={handleShowPassword}>{showPassword ? <BiShow /> : <BiHide />}</span>
+                            </div>
 
                             <div
                                 style={{ display: 'flex', justifyContent: 'center' }}
@@ -103,7 +112,7 @@ const ResetPassword = () => {
                 </div>
             </section>
         </>
-    );
-};
+    )
+}
 
-export default ResetPassword;
+export default ResetPassword

@@ -33,23 +33,23 @@ const CardFeature = ({ image, name, price, category, loading, id }) => {
                     },
                     body: JSON.stringify({ _id: id }),
                 }
-            );
-            result = await result.json();
+            )
+            result = await result.json()
             if (result.message === "fail") {
-                toast.error(result.message);
+                toast.error(result.message)
             } else {
-                toast.success("Product deleted");
-                window.location.reload(); // reset trang web sau khi xóa thành công
+                toast.success("Product deleted")
+                window.location.reload() // Reset trang web sau khi xóa thành công
             }
         }
-    };
+    }
 
 
     return (
         <div className='w-full min-w-[230px] max-w-[230px] bg-white hover:shadow-2xl drop-shadow-lg pt-5 px-4 cursor-pointer flex flex-col' style={{ borderRadius: '20px' }}>
             {
                 image ? <>
-                    <Link to={`/menu/${id}`} onClick={() => window.scrollTo({ top: "0", behavior: "smooth`" })}>
+                    <Link to={`/menu/${id}`} onClick={() => window.scrollTo({ top: "0", behavior: "smooth" })}>
                         <div className="h-40 w-full flex flex-col overflow-hidden" style={{ justifyContent: "center", alignItems: "center" }}>
                             <img src={image} className="h-full object-cover w-full" />
                         </div>
