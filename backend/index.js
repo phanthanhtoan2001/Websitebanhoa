@@ -444,7 +444,7 @@ const createbill = function (userid, total, date, note, method, address) {
 
 app.post('/checkout', async (req, res) => {
 
-
+console.log(req.body);
   const { productCartItem, userid, totalPrice, Note, paymentMethod, address } = req.body
   try {
     var today = new Date()
@@ -461,13 +461,11 @@ app.post('/checkout', async (req, res) => {
 
 
         let idbill = bill._id
-        console.log("> Created new billid\n", idbill);
         productCartItem.map(async e => {
           let productid = e._id
           let quantity = e.quanity
           createbilldetail(productid, idbill, quantity)
             .then(billdetail => {
-              console.log("> Created new Customer\n", billdetail);
             })
         })
       })
@@ -482,9 +480,10 @@ app.post('/checkout', async (req, res) => {
 //momo payment
 app.get("/momo", async (req, res) => {
   try {
-      const url = await paymentmomo(2000)// ammo
-      
-      res.send(url);
+    var money = req.url.split('=')[1];
+    console.log(money);
+      const url = await paymentmomo(money)// ammo
+      res.send(JSON.stringify(url));
   } catch (err) {
       console.error(err); // log any errors to the console
       res.status(500).send('Internal Server Error'); // return an error message to the client
