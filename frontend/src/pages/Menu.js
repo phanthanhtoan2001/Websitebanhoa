@@ -50,7 +50,7 @@ const Menu = () => {
             </div>
           }
         </div>
-        <Comment productId={filterby}/> 
+        {productDisplay && <Comment productId={filterby}/> } 
       </div>
       <AllProduct heading={"Other Product"} />
     </div>

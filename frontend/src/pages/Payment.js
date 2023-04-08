@@ -38,10 +38,9 @@ const Payment = () => {
     const [phoneNumberValid, setPhoneNumberValid] = useState(true)
 
     const validatePhoneNumber = (phoneNumber) => {
-        // regex pattern to match Vietnamese phone numbers
+        // Đầu số điện thoại VN
         const vnPhonePattern = /^(09|08|07|05|03)([0-9]{8})$/
 
-        // return true if phoneNumber matches the regular expression
         return vnPhonePattern.test(phoneNumber)
     }
 

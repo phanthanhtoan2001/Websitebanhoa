@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import CardFeature from './CardFeature'
 import FilterProducts from './FilterProducts'
-import cry from '../assets/khoc.gif';
+import cry from '../assets/khoc.gif'
 
 const AllProduct = ({ heading, loading }) => {
     // Sử dụng useSelector để truy cập dữ liệu từ redux store
@@ -25,19 +25,19 @@ const AllProduct = ({ heading, loading }) => {
 
     // Sử dụng hook useState để quản lý trạng thái khi nhập từ khóa tìm kiếm. 
     // Khi state này được đổi thành "true", component sẽ hiển thị kết quả tìm kiếm, ngược lại nếu là "false", sẽ hiển thị toàn bộ sản phẩm
-    const [searching, setSearching] = useState(false);
+    const [searching, setSearching] = useState(false)
 
     // Sử dụng hook useState để thiết lập trạng thái thông báo đã tìm thấy kết quả hay chưa
-    const [resultFound, setResultFound] = useState(false);
+    const [resultFound, setResultFound] = useState(false)
 
     // Xử lý thay đổi văn bản tìm kiếm
     const handleSearchTextChange = event => {
-        setSearchText(event.target.value);
-        setSearching(true); // đặt searching thành true mỗi khi người dùng nhập văn bản mới.
+        setSearchText(event.target.value)
+        setSearching(true) // đặt searching thành true mỗi khi người dùng nhập văn bản mới.
 
         // Reset thông báo kết quả tìm kiếm.
-        setResultFound(false);
-    };
+        setResultFound(false)
+    }
 
     // Xử lý hiển thị tất cả nút bấm, đặt lại giá trị của filterBy và searchText về giá trị ban đầu.
     const handleShowAll = () => {
@@ -79,18 +79,18 @@ const AllProduct = ({ heading, loading }) => {
             )
         } else {
             // Hiển thị trạng thái tải
-            setSearching(true);
+            setSearching(true)
             setTimeout(() => {
                 const filteredProducts = searchProductByName(searchText).filter(
                     e => filterBy.length === 0 || e.category.toLowerCase() === filterBy.toLowerCase()
-                );
+                )
                 // Đặt dataFilter sử dụng mảng tạm thời để giữ tất cả các sản phẩm mà không xóa bất kỳ
-                setDataFilter([...filteredProducts]);
+                setDataFilter([...filteredProducts])
                 // Ẩn trạng thái tải
-                setSearching(false);
-            }, 2000);
+                setSearching(false)
+            }, 2000)
         }
-    }, [productData, filterBy, searchText]);
+    }, [productData, filterBy, searchText])
 
     return (
         <div className="my-5 mt-20">

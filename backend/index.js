@@ -94,8 +94,8 @@ app.post('/login', async (req, res) => {
   try {
     const result = await userModel.findOne({ email: email })
 
-    if (result && await bcrypt.compare(password, result.password)) { // Compare input password with hash from database
-      const token = jwt.sign({ email: result.email }, accessTokenSecret); // Xuất JWT với payload là email
+    if (result && await bcrypt.compare(password, result.password)) { // So sánh mật khẩu đầu vào với hàm băm từ cơ sở dữ liệu
+      const token = jwt.sign({ email: result.email }, accessTokenSecret) // Xuất JWT với payload là email
 
       const dataSend = {
         _id: result._id,
@@ -133,39 +133,66 @@ app.post('/login', async (req, res) => {
   }
 })
 
+app.put('/users/:userId', async (req, res) => {
+  const { userId } = req.params
+  const { email, firstName, lastName, image } = req.body
+
+  try {
+    const user = await userModel.findByIdAndUpdate(
+      userId,
+      {
+        $set: {
+          email: email,
+          firstName: firstName,
+          lastName: lastName,
+          image: image
+        }
+      },
+      { new: true }
+    )
+    if (!user) {
+      return res.status(404).json({ message: "User not found." })
+    }
+
+    return res.json(user)
+  } catch (error) {
+    console.error(error)
+    return res.status(500).json({ message: "Internal server error." })
+  }
+})
 
 // Lấy thông tin tài khoản người dùng
 app.get("/users/:userId", async (req, res) => {
-  const { userId } = req.params;
+  const { userId } = req.params
   try {
-    const user = await userModel.findById(userId);
+    const user = await userModel.findById(userId)
     if (!user) {
-      return res.status(404).json({ message: "User not found." });
+      return res.status(404).json({ message: "User not found." })
     }
-    return res.json(user);
+    return res.json(user)
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Internal server error." });
+    console.error(error)
+    return res.status(500).json({ message: "Internal server error." })
   }
-});
+})
 
 // POST yêu cầu gửi OTP đến email người dùng
 app.post('/send-otp', async (req, res) => {
   try {
-    const userEmail = req.body.email;
+    const userEmail = req.body.email
 
     // Tìm thông tin người dùng dựa trên email trong database.
-    const user = await userModel.findOne({ email: userEmail });
+    const user = await userModel.findOne({ email: userEmail })
     if (!user) {
-      return res.status(404).json({ message: "User not found!" });
+      return res.status(404).json({ message: "User not found!" })
     }
 
     // Tạo mã OTP ngẫu nhiên và băm nó sử dụng jwt
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const token = jwt.sign({ otp }, accessTokenSecret, { expiresIn: '10m' });
+    const otp = Math.floor(100000 + Math.random() * 900000).toString()
+    const token = jwt.sign({ otp }, accessTokenSecret, { expiresIn: '10m' })
 
     // Cập nhật mã xác minh của người dùng với mã OTP mới trong database
-    await userModel.findByIdAndUpdate(user._id, { $set: { verifytoken: token } });
+    await userModel.findByIdAndUpdate(user._id, { $set: { verifytoken: token } })
 
     // Cấu hình nodemailer
     let transporter = nodemailer.createTransport({
@@ -179,7 +206,7 @@ app.post('/send-otp', async (req, res) => {
       tls: {
         ciphers: 'SSLv3'
       }
-    });
+    })
 
     // Gửi email với mã OTP và chuyển hướng người dùng đến trang nhập OTP
     let mailOptions = {
@@ -187,22 +214,22 @@ app.post('/send-otp', async (req, res) => {
       to: userEmail,
       subject: 'Your OTP Code',
       html: `<p>Your OTP code is: <b>${otp}</b></p><p>Please use this code within 10 minutes to reset your password.</p><a href="http://localhost:3000/resetpassword/${token}">Enter OTP code ></a>`
-    };
+    }
 
     transporter.sendMail(mailOptions, function (error, info) {
       if (error) {
-        console.log(error);
-        return res.status(500).json({ message: "Failed to send OTP!" });
+        console.log(error)
+        return res.status(500).json({ message: "Failed to send OTP!" })
       } else {
-        console.log('Email sent: ' + info.response);
-        return res.status(200).json({ message: "OTP has been sent to your email!" });
+        console.log('Email sent: ' + info.response)
+        return res.status(200).json({ message: "OTP has been sent to your email!" })
       }
-    });
+    })
   } catch (error) {
-    console.log(error);
-    return res.status(500).json({ message: "Failed to send OTP!" });
+    console.log(error)
+    return res.status(500).json({ message: "Failed to send OTP!" })
   }
-});
+})
 
 // POST yêu cầu xác thực OTP và reset mật khẩu
 app.post('/verify-otp', async (req, res) => {
@@ -210,31 +237,31 @@ app.post('/verify-otp', async (req, res) => {
     image.pngimage.png
 
     // Xác minh mã thông báo OTP bằng mã OTP đầu vào
-    const decodedToken = jwt.verify(token, accessTokenSecret);
+    const decodedToken = jwt.verify(token, accessTokenSecret)
     if (!decodedToken || decodedToken.otp !== otp) {
-      return res.status(400).json({ message: "Invalid OTP code!" });
+      return res.status(400).json({ message: "Invalid OTP code!" })
     }
 
     // Cập nhật mật khẩu của người dùng và xóa mã thông báo xác minh
-    const user = await userModel.findOne({ verifytoken: token });
+    const user = await userModel.findOne({ verifytoken: token })
     if (!user) {
-      return res.status(404).json({ message: "User not found!" });
+      return res.status(404).json({ message: "User not found!" })
     }
 
     // Hash mật khẩu mới
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    const hashedPassword = await bcrypt.hash(newPassword, 10)
 
     // Cập nhật mật khẩu đã được mã hóa vào CSDL và xóa đường dẫn xác thực
-    user.password = hashedPassword;
-    user.verifytoken = accessTokenSecret;
-    await user.save();
+    user.password = hashedPassword
+    user.verifytoken = accessTokenSecret
+    await user.save()
 
-    return res.status(200).json({ message: "Password has been reset successfully!" });
+    return res.status(200).json({ message: "Password has been reset successfully!" })
   } catch (error) {
-    console.log(error);
-    return res.status(500).json({ message: "OTP verification failed!" });
+    console.log(error)
+    return res.status(500).json({ message: "OTP verification failed!" })
   }
-});
+})
 
 // Xác định lược đồ sản phẩm cho mongoose
 const schemaProduct = mongoose.Schema({
@@ -328,66 +355,50 @@ app.get('/comments', async (req, res) => {
   }
 })
 
-// const authenticateToken = (req, res, next) => {
-//   const authHeader = req.headers['authorization']
-//   const token = authHeader && authHeader.split(' ')[1]
-
-//   if (token == null) {
-//     req.$user = null;
-//     return next()
-//   }
-
-//   jwt.verify(token, accessTokenSecret, (err, user) => {
-//     if (err) {
-//       req.$user = null;
-//       return next();
-//     }
-
-//     console.log(`User ${user.email} is authenticated.`)
-
-//     localStorage.setItem()
-
-//     // Save user information to context of the request
-//     req.$user = user
-//     next()
-//   })
-// }
-
 app.post('/products/:id/comments', async (req, res) => {
   try {
-    const productId = req.params.id;
-    const { content } = req.body;
+    const productId = req.params.id
+    const { user, content } = req.body
 
     if (!mongoose.Types.ObjectId.isValid(productId)) {
       throw new Error('Invalid product ID')
     }
 
-    const product = await productModel.findById(productId);
-
+    const product = await productModel.findById(productId)
     if (!product) {
-      throw new Error('Product not found');
+      throw new Error('Product not found')
     }
 
-    let user;
-    if (req.user && req.user.email) {
-      user = req.user.email;
-    } else {
-      user = 'Anonymous';
-    }
+    const comment = { user, content }
+    product.comments.push(comment)
+    await product.save()
 
-    const comment = { user, content };
-    
-    product.comments.push(comment);
-    await product.save();
-
-    res.status(201).json({ message: 'Comment created' });
-    console.log(product)
+    res.status(201).json({ message: 'Comment created' })
   } catch (error) {
     console.log(error)
     res.status(400).json({ message: error.message })
   }
-});
+})
 
+app.get('/products/:id/comments', async (req, res) => {
+  try {
+    const productId = req.params.id
+
+    if (!mongoose.Types.ObjectId.isValid(productId)) {
+      throw new Error('Invalid product ID')
+    }
+
+    const product = await productModel.findById(productId)
+    if (!product) {
+      throw new Error('Product not found')
+    }
+
+    res.status(200).json({ comments: product.comments })
+  } catch (error) {
+    console.log(error)
+    res.status(400).json({ message: error.message })
+  }
+})
 
 // Khởi động máy chủ
 app.listen(PORT, () => {

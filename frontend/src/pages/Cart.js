@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import CartProduct from '../components/CartProduct';
-import emptyCart from '../assets/empty-cart.gif';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import CartProduct from '../components/CartProduct'
+import emptyCart from '../assets/empty-cart.gif'
+import { Link } from 'react-router-dom'
 
 function Cart() {
     const productCartItem = useSelector((state) => state.product.cartItem) // Lấy cart item từ redux store
@@ -20,7 +20,7 @@ function Cart() {
                 <h2 className='text-lg md:text-4xl font-bold text-slate-600'>Your Cart Items</h2>
                 {productCartItem[0] ?
                     <div className='my-5 mx-5 flex gap-4'>
-                        {/*display cart items*/}
+                        {/*Giao diện các sản phẩm*/}
                         <div className='w-full max-w-5xl' style={{ width: '2800px' }}>
                             {
                                 productCartItem.map(e => {
@@ -40,7 +40,7 @@ function Cart() {
                             }
                         </div>
 
-                        {/*total cart item*/}
+                        {/*Tổng tiền*/}
                         <div className='w-96 p-4 bg-green-200 rounded-lg shadow-xl ml-auto mx-auto flex flex-col' style={{ height: '400px' }}>
                             <h2 className='text-3xl font-bold text-blue-600 p-3 border-b-2 border-blue-200'>Order Summary</h2>
                             <div className='flex flex-col flex-grow-1 w-full p-4'>

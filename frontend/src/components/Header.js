@@ -71,11 +71,23 @@ const Header = () => {
                   //Hiện thị link 'New product' cho người dùng với email là email của admin
                   userData.email === process.env.REACT_APP_ADMIN_EMAIL && <Link to={'/newproduct'} className='whitespace-nowrap cursor-pointer text-black'>New product</Link>
                 }
-                {
-                  userData.image ? (<p className='flex items-center justify-center cursor-pointer text-white px-3 bg-red-300' onClick={handleLogout}>
-                    Logout ({userData.firstName})
-                  </p>) : (<Link to={'/login'} className='whitespace-nowrap cursor-pointer text-black'>Login</Link>)
-                }
+                {userData.email ? (
+                  <div>
+                    <Link to={`/information/${userData._id}`} className="text-black">
+                      Information
+                    </Link>
+                    <p
+                      className="flex items-center justify-center cursor-pointer text-white px-3 bg-red-300"
+                      onClick={handleLogout}
+                    >
+                      Logout ({userData.firstName})
+                    </p>
+                  </div>
+                ) : (
+                  <Link to="/login" className="whitespace-nowrap cursor-pointer text-black">
+                    Login
+                  </Link>
+                )}
               </div>
             )}
           </div>

@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'
 import { FiUploadCloud } from "react-icons/fi"
-import { ImagetoBase64 } from '../utility/ImagetoBase64';
+import { ImagetoBase64 } from '../utility/ImagetoBase64'
 import { toast } from 'react-hot-toast'
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom'
 
 const UpdateProduct = () => {
   // useState để lưu giữ các state của component, bao gồm tên, danh mục, ảnh, giá và mô tả sản phẩm
@@ -43,10 +43,10 @@ const UpdateProduct = () => {
     // Kiểm tra điều kiện để đảm bảo các trường bắt buộc được điền và giá tiền hợp lệ
     if (!name || !category || !image || !description) {
       toast("Enter required fields")
-      return;
+      return
     } else if (!price.includes(".")) {
-      toast("Please enter a valid price");
-      return;
+      toast("Please enter a valid price")
+      return
     }
 
     try {
@@ -132,7 +132,7 @@ const UpdateProduct = () => {
         </button>
       </form>
     </div>
-  );
+  )
 }
 
 export default UpdateProduct
