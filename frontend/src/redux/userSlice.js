@@ -1,6 +1,6 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit"
 
-const LOCAL_STORAGE_KEY = process.env.REACT_APP_LOCAL_STORAGE_KEY;
+const LOCAL_STORAGE_KEY = process.env.REACT_APP_LOCAL_STORAGE_KEY
 
 // Xác định trạng thái ban đầu cho người dùng
 let initialState = {
@@ -24,13 +24,17 @@ export const userSlice = createSlice({
     name: "user",
     initialState,
     reducers: {
+        setUserId: (state, { payload }) => {   // Tạo reducer mới để lưu giữ giá trị id vào store
+            return { ...state, _id: payload }
+        },
+
         // Xác định chức năng giảm loginRedux
         loginRedux: (state, action) => {
             console.log(action.payload.data) // Ghi lại dữ liệu nhận được từ hành động
 
             // Cập nhật trạng thái với dữ liệu người dùng nhận được từ điểm cuối API
 
-            state.isLoggedIn = true;
+            state.isLoggedIn = true
             state._id = action.payload.data._id
             state.firstName = action.payload.data.firstName
             state.lastName = action.payload.data.lastName
@@ -46,7 +50,8 @@ export const userSlice = createSlice({
         logoutRedux: (state, action) => {
             // Xóa trạng thái khi người dùng đăng xuất
 
-            state.isLoggedIn = false;
+            state.isLoggedIn = false
+
             state._id = ""
             state.firstName = ""
             state.lastName = ""
@@ -60,15 +65,16 @@ export const userSlice = createSlice({
 
         // Add a function to check if the user is logged in
         isUserLoggedIn: (state) => {
-            return state.isLoggedIn;
+
+            return state.isLoggedIn
 
         },
     },
-});
+})
 
 // Lấy ra các action được định nghĩa trong slice
 
 export const { loginRedux, logoutRedux, isUserLoggedIn } = userSlice.actions
 
 // Export reducer của slice
-export default userSlice.reducer;
+export default userSlice.reducer

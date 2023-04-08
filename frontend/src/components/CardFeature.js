@@ -33,16 +33,16 @@ const CardFeature = ({ image, name, price, category, loading, id }) => {
                     },
                     body: JSON.stringify({ _id: id }),
                 }
-            );
-            result = await result.json();
+            )
+            result = await result.json()
             if (result.message === "fail") {
-                toast.error(result.message);
+                toast.error(result.message)
             } else {
-                toast.success("Product deleted");
-                window.location.reload(); // reset trang web sau khi xóa thành công
+                toast.success("Product deleted")
+                window.location.reload() // Reset trang web sau khi xóa thành công
             }
         }
-    };
+    }
 
 
     return (

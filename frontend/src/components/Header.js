@@ -53,7 +53,7 @@ const Header = () => {
           {userData.email === process.env.REACT_APP_ADMIN_EMAIL && <Link to={'/chartproduct'} className='mx-4 text-gray-600 hover:text-red-500 my-2 md:my-0' style={{ fontSize: '1.6rem' }}>
             Chart Product
           </Link>}
-          
+
 
           <div className='text-2x1 text-slate-600 relative'>
             <Link to={'/cart'} className='ml-10 mx-4 text-gray-600 hover:text-red-500'>
@@ -80,11 +80,30 @@ const Header = () => {
                   //Hiện thị link 'New product' cho người dùng với email là email của admin
                   userData.email === process.env.REACT_APP_ADMIN_EMAIL && <Link to={'/newproduct'} className='whitespace-nowrap cursor-pointer text-black'>New product</Link>
                 }
-                {
-                  userData.email ? (<p className='flex items-center justify-center cursor-pointer text-white px-3 bg-red-300' onClick={handleLogout}>
-                    Logout ({userData.firstName})
-                  </p>) : (<Link to={'/login'} className='whitespace-nowrap cursor-pointer text-black'>Login</Link>)
-                }
+
+
+         
+
+                  {
+                    userData.email ? (
+                      <div>
+                        <Link to={`/information/${userData._id}`} className="text-black">
+                          Information
+                        </Link>
+                        <p
+                          className="flex items-center justify-center cursor-pointer text-white px-3 bg-red-300"
+                          onClick={handleLogout}
+                        >
+                          Logout ({userData.firstName})
+                        </p>
+                      </div>
+                    ) : (
+                      <Link to="/login" className="whitespace-nowrap cursor-pointer text-black">
+                        Login
+                      </Link>
+                    )
+                  }
+
               </div>
             )}
           </div>
