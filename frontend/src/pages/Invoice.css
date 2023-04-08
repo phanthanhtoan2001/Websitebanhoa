@@ -1,0 +1,34 @@
+.invoice {
+    width: 80%;
+    margin: 0 auto;
+    font-family: Arial, sans-serif;
+    border: 1px solid #ccc;
+    padding: 20px;
+    background-color: white;
+  }
+  
+  h1 {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+  
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+  
+  th, td {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: left;
+  }
+  
+  th {
+    background-color: #f2f2f2;
+  }
+  
+  .total {
+    margin-top: 40px;
+    text-align: right;
+  }
+  

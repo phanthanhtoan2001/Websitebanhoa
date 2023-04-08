@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Chart from "chart.js/auto"; // quan trọng
 import { Pie } from "react-chartjs-2";
-
+import { Link } from 'react-router-dom';
 
 
 const labels = [];
@@ -76,6 +76,11 @@ const ChartProduct = () => {
           <td>{item.date}</td>
           <td>{item.note}</td>
           <td>{item.total}</td>
+          <td>   <Link to={{ pathname: '/invoice', search: `?id=${item._id}`, }}
+                  >
+                  Chi tiết
+                </Link>
+          </td>
         </tr>
       )
     });

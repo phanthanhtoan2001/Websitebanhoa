@@ -21,6 +21,7 @@ import Payment from './pages/Payment'
 
 import ListUser from './pages/ListUser'
 import ChartProduct from './pages/ChartProduct'
+import Invoice from './pages/Invoice'
 
 
 const router = createBrowserRouter(
@@ -42,6 +43,7 @@ const router = createBrowserRouter(
 
       <Route path='listuser' element={<ListUser />} />
       <Route path='chartproduct' element={<ChartProduct />} />
+      <Route path='invoice' element={<Invoice />} />
 
     </Route>
   )

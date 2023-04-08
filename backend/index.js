@@ -436,7 +436,7 @@ app.get("/chartproduct", async (req, res) => {
     },
     {
       $sort: {
-        date: -1 
+        date: -1
       }
     }
   ]);
@@ -445,6 +445,57 @@ app.get("/chartproduct", async (req, res) => {
     allBills: allBills
   };
   res.send(JSON.stringify(data));
+
+})
+app.get("/invoicebill", async (req, res) => {
+
+  const result = await billdetailModel.aggregate([
+    {
+      // Bước 1: Tìm kiếm thông tin chi tiết hóa đơn với mã hóa đơn là 'HD001'
+      $match: { billid: new mongoose.Types.ObjectId(req.query.idbill) }
+    },
+    {
+      // Bước 2: Join với bảng sản phẩm để lấy thông tin sản phẩm
+      $lookup: {
+        from: 'products', // Tên bảng sản phẩm
+        localField: 'productid', // Trường liên kết trong bảng chi tiết hóa đơn
+        foreignField: '_id', // Trường liên kết trong bảng sản phẩm
+        as: 'product' // Tên trường chứa thông tin sản phẩm sau khi join
+      }
+    },
+    {
+      // Bước 3: Join với bảng người dùng để lấy thông tin người dùng
+      $lookup: {
+        from: 'users', // Tên bảng người dùng
+        localField: 'userid', // Trường liên kết trong bảng chi tiết hóa đơn
+        foreignField: '_id', // Trường liên kết trong bảng người dùng
+        as: 'user' // Tên trường chứa thông tin người dùng sau khi join
+      }
+    },
+    {
+      // Bước 3: Join với bảng người dùng để lấy thông tin người dùng
+      $lookup: {
+        from: 'bills', // Tên bảng người dùng
+        localField: 'billid', // Trường liên kết trong bảng chi tiết hóa đơn
+        foreignField: '_id', // Trường liên kết trong bảng người dùng
+        as: 'bill' // Tên trường chứa thông tin người dùng sau khi join
+      }
+    },
+    {
+      // Bước 4: Định dạng lại kết quả trả về
+      $project: {
+        _id: 0,
+        billdetail_id: '$_id',
+        quantity: '$quantity',
+        product: { $arrayElemAt: ['$product', 0] },
+        user: { $arrayElemAt: ['$user', 0] },
+        bill: { $arrayElemAt: ['$bill', 0] }
+      }
+    }
+  ]);
+
+  //console.log(req.query.idbill)
+  res.send(result)
 
 })
 // END ADMIN
