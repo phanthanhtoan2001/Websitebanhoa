@@ -1,5 +1,6 @@
 #Run project
-Step 1: Open Terminal run cmd:
+Step 1: Open Terminal run cmd:<br>
+`cd .\frontend\` Enter<br>
 `npm i --force` Enter <br>
 `npm run start` Enter<br>
 #Error using {
@@ -17,7 +18,7 @@ Step 1: Open Terminal run cmd:
 
 
 
-Step 2: Open new terminal again:
+Step 2: Open new terminal again:<br>
 `cd .\backend\` Enter<br>
 `npm i cors` Enter<br>
 `npm run dev` Enter<br>
