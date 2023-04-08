@@ -14,14 +14,15 @@ const Payment = () => {
         0
     ).toLocaleString('vi', { style: 'decimal', minimumFractionDigits: 0 })
 
-
     const totalQuantity = productCartItem.reduce((acc, curr) => acc + parseInt(curr.quanity), 0)
 
     const userEmail = useSelector(state => state.user.email)
     const userid = useSelector(state => state.user._id)
+
     const firstName = useSelector(state => state.user.firstName)
     const lastName = useSelector(state => state.user.lastName)
     const fullName = firstName + " " + lastName
+
 
     const [data, setData] = useState({ //state chứa các thông tin nhập vào từ form
         productCartItem,
@@ -91,6 +92,7 @@ const Payment = () => {
                   [name]: value
                 }
               })
+
         } else {
             setShowBankAccountInfo(false)
             setShowMomoAccountInfo(false)
@@ -125,6 +127,7 @@ const Payment = () => {
             navigate("/")
           }
 
+
     }
 
     return (
@@ -135,6 +138,7 @@ const Payment = () => {
                     <label className='text-base font-medium text-gray-700 mb-2' htmlFor='fullname'>Fullname</label>
 
                     <input className='border-gray-300 border-2 rounded-md p-2 mb-4' type='text' id='fullname' name='fullname' readOnly required value={fullName}  />
+
                     <label className='text-base font-medium text-gray-700 mb-2' htmlFor='email'>Email</label>
                     <input className='border-gray-300 border-2 rounded-md p-2 mb-4' type='email' id='email' name='email' readOnly required value={userEmail} />
                     <label className='text-base font-medium text-gray-700 mb-2' htmlFor='address'>Address</label>
@@ -163,6 +167,7 @@ const Payment = () => {
                     />
                     <label className='text-base font-medium text-gray-700 mb-2' htmlFor='Note'>Note</label>
                     <textarea className='border-gray-300 border-2 rounded-md p-2 mb-4' id='Note' name='Note' rows='3' onChange={handleOnChange}></textarea>
+
                     <div>
                         <label className='text-base font-medium text-gray-700 mb-2 mr-3' htmlFor='paymentMethod'>
                             Payment methods
@@ -173,7 +178,7 @@ const Payment = () => {
                             name='paymentMethod'
                             required
                             onChange={handlePaymentMethodChange}
-                            
+
                         >
                             <option>Select payment method</option>
                             <option value='momo'>Momo</option>

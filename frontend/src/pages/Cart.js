@@ -15,11 +15,7 @@ function Cart() {
     const totalQuantity = productCartItem.reduce((acc, curr) => acc + parseInt(curr.quanity), 0)
 
 
-    // Define this function somewhere in your codebase to check if the user is logged in
-    function isUserLoggedIn() {
-        const loggedInStatus = localStorage.getItem('isLoggedIn')
-        return !!loggedInStatus // This converts a truthy/falsy value to a boolean
-    }
+    const isLoggedIn = useSelector((state) => state.user.isLoggedIn)
 
 
 
@@ -64,9 +60,11 @@ function Cart() {
                             </div>
                             <div className='w-full text-2xl font-bold py-2 text-white bg-red-400 mt-auto text-center'>
 
-                                <Link to={isUserLoggedIn() ? "/payment" : "/login"}>
-                                    <button>{isUserLoggedIn() ? "Add Information" : "Log in to continue"}</button>
-                                </Link>
+                                {isLoggedIn ? (
+                                    <Link to="/payment">Add Information</Link>
+                                ) : (
+                                    <Link to="/login">Log in to continue</Link>
+                                )}
 
                             </div>
                         </div>

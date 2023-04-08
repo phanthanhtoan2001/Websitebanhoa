@@ -21,6 +21,7 @@
     "react-chartjs-2": "^5.2.0",
     "react-confirm-alert": "^3.0.6",
     "react-dom": "^18.2.0",
+    "react-google-maps": "^9.4.5",
     "react-hot-toast": "^2.4.0",
     "react-icons": "^4.7.1",
     "react-places-autocomplete": "^7.3.0",
@@ -58,5 +59,9 @@
   "devDependencies": {
     "react-scripts": "^5.0.1",
     "tailwindcss": "^3.2.7"
-  }
+  },
+  "description": "This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).",
+  "main": "tailwind.config.js",
+  "author": "",
+  "license": "ISC"
 }

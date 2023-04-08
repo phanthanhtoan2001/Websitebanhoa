@@ -2,12 +2,13 @@ import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import CardFeature from './CardFeature'
 import FilterProducts from './FilterProducts'
-
 import cry from '../assets/khoc.gif';
+
 
 const AllProduct = ({ heading, loading }) => {
     // Sử dụng useSelector để truy cập dữ liệu từ redux store
     const productData = useSelector(state => state.product.productList)
+
 
     // Tạo một mảng gồm 10 phần tử null để hiển thị loading
     const loadingArrayFeature = new Array(10).fill(null)
@@ -156,7 +157,6 @@ const AllProduct = ({ heading, loading }) => {
         </div>
     )
 }
-
 
 export default AllProduct
 

@@ -37,7 +37,7 @@ const Header = () => {
           <Link to={'/'} className='mx-4 text-gray-600 hover:text-red-500 my-2 md:my-0' style={{ fontSize: '1.6rem' }}>
             Home
           </Link>
-          <Link to={'/menu/64044b0f441f315547c69a7c'} className='mx-4 text-gray-600 hover:text-red-500 my-2 md:my-0' style={{ fontSize: '1.6rem' }}>
+          <Link to={'/menu/64044e081d57ce8320c49d91'} className='mx-4 text-gray-600 hover:text-red-500 my-2 md:my-0' style={{ fontSize: '1.6rem' }}>
             Menu
           </Link>
           <Link to={'/about'} className='mx-4 text-gray-600 hover:text-red-500 my-2 md:my-0' style={{ fontSize: '1.6rem' }}>
@@ -81,7 +81,7 @@ const Header = () => {
                   userData.email === process.env.REACT_APP_ADMIN_EMAIL && <Link to={'/newproduct'} className='whitespace-nowrap cursor-pointer text-black'>New product</Link>
                 }
                 {
-                  userData.image ? (<p className='flex items-center justify-center cursor-pointer text-white px-3 bg-red-300' onClick={handleLogout}>
+                  userData.email ? (<p className='flex items-center justify-center cursor-pointer text-white px-3 bg-red-300' onClick={handleLogout}>
                     Logout ({userData.firstName})
                   </p>) : (<Link to={'/login'} className='whitespace-nowrap cursor-pointer text-black'>Login</Link>)
                 }
