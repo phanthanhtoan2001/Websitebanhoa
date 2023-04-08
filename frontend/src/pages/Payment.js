@@ -36,7 +36,8 @@ const Payment = () => {
         totalPrice,
         Note: "",
         paymentMethod: "",
-        address: ""
+        address: "",
+        phoneNumber: ""
       })
 
 
@@ -70,6 +71,13 @@ const Payment = () => {
     }
 
     const onPhoneNumberChange = (event) => {
+        const { name, value } = event.target
+        setData((preve) => {
+            return {
+              ...preve,
+              [name]: value
+            }
+          })
         setPhoneNumber(event.target.value)
         setPhoneNumberValid(validatePhoneNumber(event.target.value))
     }

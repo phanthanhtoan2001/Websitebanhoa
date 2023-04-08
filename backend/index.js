@@ -533,20 +533,22 @@ const billSchema = mongoose.Schema({
   note: String,
   method: String,
   address: String,
+  phoneNumber: String
 })
 
 const billModel = new mongoose.model("Bill", billSchema) // Tạo model instance cho User schema để tương tác với MongoDB
 module.exports = billModel // Xuất billdetail để sử dụng ở nơi khác trong ứng dụng
 
 
-const createbill = function (userid, total, date, note, method, address) {
+const createbill = function (userid, total, date, note, method, address, phoneNumber) {
   const billdetail = new billModel({
     userid,
     total,
     date,
     note,
     method,
-    address
+    address,
+    phoneNumber
   });
 
   return billdetail.save();
@@ -554,8 +556,8 @@ const createbill = function (userid, total, date, note, method, address) {
 
 app.post('/checkout', async (req, res) => {
 
-// console.log(req.body);
-  const { productCartItem, userid, totalPrice, Note, paymentMethod, address } = req.body
+ console.log(req.body);
+  const { productCartItem, userid, totalPrice, Note, paymentMethod, address, phone } = req.body
   try {
     var today = new Date()
     if (today.getMonth() + 1 < 10)
@@ -566,7 +568,7 @@ app.post('/checkout', async (req, res) => {
 
     else var dates = today.getDate()
     date = today.getFullYear() + '/' + month + '/' + dates;
-    await createbill(userid, totalPrice, date, Note, paymentMethod, address)
+    await createbill(userid, totalPrice, date, Note, paymentMethod, address, phone)
       .then(bill => {
 
 
